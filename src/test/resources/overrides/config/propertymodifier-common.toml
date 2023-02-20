@@ -1,0 +1,205 @@
+
+#A few general things to note:
+#Any invalid entries will result in a log warning, but will just be skipped, and working entries will work.
+#Most entries will utilize a block, item or enchantment id, which needs to be in the modid:blockid, modid:itemid or modid:enchantmentid format, respectively. "minecraft:" is not optional.
+#All of these support regex. So you could use .* to select all entries, or minecraft:.* to select all elements in the minecraft namespace. For further information, please consult Google.
+#Entries are read from left to right, this means that entries will overwrite entries read before it if they modify the same block/item/enchantment.
+#NBT and blockstates are currently not supported in any way.
+[logging]
+	#Whether to log successful operations or not.
+	log_successful = true
+	#Whether to log failed operations or not.
+	log_errors = true
+
+[item_groups]
+	#Define new item groups. Format is "id;icon", with icon being an item id. Will run before the below stuff, allowing you to use these groups below. Note that you need to set a translation using a resource pack, otherwise an itemGroup.<id> translation key will appear. Do not use "none" as a name, as this is the key used to remove an item from any group.
+	item_group = []
+	#Removes item groups that have no items, including empty ones created by this mod. Runs after the below stuff, clearing up any empty groups left from moving all items out of them.
+	remove_empty_item_groups = true
+
+#Dumps all corresponding values with their changeable properties into the logs.
+[dump]
+	#Dump blocks BEFORE applying the changes.
+	dump_blocks = false
+	#Dump blocks AFTER applying the changes.
+	dump_blocks_after = false
+	#Dump blocks BEFORE applying the changes. Only dumps non-default values. Does nothing if dump_blocks is set to true.
+	dump_blocks_non_default = false
+	#Dump blocks AFTER applying the changes. Only dumps non-default values. Does nothing if dump_blocks_after is set to true.
+	dump_blocks_after_non_default = false
+	#Dump items BEFORE applying the changes. Due to technical reasons, repair materials cannot be dumped.
+	dump_items = false
+	#Dump items AFTER applying the changes. Due to technical reasons, repair materials cannot be dumped.
+	dump_items_after = false
+	#Dump items BEFORE applying the changes. Repair materials cannot be dumped (technical limitations). Only dumps non-default values. Does nothing if dump_items is set to true.
+	dump_items_non_default = false
+	#Dump items AFTER applying the changes. Repair materials cannot be dumped (technical limitations). Only dumps non-default values. Does nothing if dump_items is set to true.
+	dump_items_after_non_default = false
+	#Dump enchantments BEFORE applying the changes.
+	dump_enchantments = false
+	#Dump enchantments AFTER applying the changes.
+	dump_enchantments_after = false
+	#Dump item groups BEFORE applying the changes.
+	dump_groups = false
+	#Dump item groups AFTER applying the changes.
+	dump_groups_after = false
+	#Dump composter inputs BEFORE applying the changes.
+	dump_composter = false
+	#Dump composter inputs AFTER applying the changes.
+	dump_composter_after = false
+	#Dump stripping transitions BEFORE applying the changes.
+	dump_stripping = false
+	#Dump stripping transitions AFTER applying the changes.
+	dump_stripping_after = false
+	#Dump pathing transitions BEFORE applying the changes.
+	dump_pathing = false
+	#Dump pathing transitions AFTER applying the changes.
+	dump_pathing_after = false
+	#Dump tilling transitions BEFORE applying the changes.
+	dump_tilling = false
+	#Dump tilling transitions AFTER applying the changes.
+	dump_tilling_after = false
+	#The default enchantability of items. Change this if you have a mod installed that makes every item enchantable. If you're unsure, leave this unchanged and run the item dumping. You'll see if you need to change it or not.
+	#Range: > 0
+	default_enchantability = 0
+
+#Settings related to blocks. Format is "blockid;value", unless stated otherwise.
+[blocks]
+	#How long the block takes to break. 0.5 is dirt, 1.5 is stone, 50 is obsidian. -1 makes the block unbreakable. Not recommended for blocks with blockstate-dependent hardness that may be added by other mods. Default value: 0
+	hardness = []
+	#How blast-resistant the block is. 0.5 is dirt, 6 is stone and cobblestone, 1200 is obsidian. 3600000 or more makes the block unbreakable. Default value: 0
+	resistance = []
+	#The block's harvest level. -1 is any harvest level. Default value: -1
+	harvest_level = []
+	#The block's harvest tool. Must be one of axe, hoe, pickaxe, shovel or none.
+	harvest_tool = []
+	#Whether you need a corresponding tool, as set by the harvest tool, at least of the harvest level to get block drops (e.g. stone) or if the harvest tool type only speeds up the breaking speed (e.g. dirt). Default value: false
+	requires_tool = []
+	#The light level emitted by this block. Not recommended for blocks with blockstate-dependant light level (e. g. furnaces). Default value: 0
+	light_level = []
+	#How slippery the block is. Default value: 0.6
+	slipperiness = []
+	#Accelerates (if > 1) or slows down (if between 0 and 1) entities that walk upon this block. Default value: 1
+	speed_factor = []
+	#Allows entities on this block to jump higher (if > 1) or lower (if between 0 and 1). Default value: 1
+	jump_factor = []
+	#The sound type the block has. Only vanilla sound types are supported. Default value: stone. Vanilla sound types are:
+	#wood, ground, plant, lily_pads, stone, metal, glass, cloth, sand, snow, ladder, anvil, slime, honey, wet_grass, coral, bamboo, bamboo_sapling, scaffolding, sweet_berry_bush, crop, stem, vine, nether_wart, lantern, hyphae, nylium, fungus, root, shroomlight, nether_vine, nether_vine_lower_pitch, soul_sand, soul_soil, basalt, wart, netherrack, nether_brick, nether_sprout, nether_ore, bone, netherite, ancient_debris, lodestone, chain, nether_gold, gilded_blackstone
+	sound_type = []
+
+#Settings related to items. Format is "item;value", unless stated otherwise.
+[items]
+	#The max durability an item has. Can only be set on damageable items. Default value: 0
+	max_damage = []
+	#The max stack size an item has. Can't be set on damageable items. Default value: 64 (1 for damageable items)
+	max_stack_size = []
+	#The item group (= creative tab) of an item. Use "none" to remove the item from any item group. Default value: none
+	group = []
+	#Whether the item should have the fire and lava shielding properties of netherite or not. Default value: false
+	is_immune_to_fire = []
+	#Sets the item rarity (currently only affects text color). Must be one of common (white), uncommon (yellow), rare (aqua) and epic (light purple). Default value: common
+	rarity = []
+	#Sets the enchantability of the item. Default value: the default enchantability defined above
+	enchantability = []
+	#Sets the repair material of the item. Tags (e.g. #minecraft:planks) are also allowed.
+	repair_material = []
+
+	#Settings related to armor. Only armor items (excluding the elytra) can be affected, anything else will be skipped.
+	[items.armor]
+		#Sets the armor value.
+		armor = []
+		#Sets the armor toughness value. Default value: 0
+		toughness = []
+		#Sets the knockback resistance. Default value: 0
+		knockback_resistance = []
+
+	#Settings related to tools. Only tool, sword and trident items can be affected, anything else will be skipped.
+	[items.tools]
+		#Sets the attack damage.
+		attack_damage = []
+		#Sets the attack speed.
+		attack_speed = []
+		#Sets the tool harvest level. Does not work for swords and tridents.
+		harvest_level = []
+		#Sets the efficiency. Does not work for swords and tridents.
+		efficiency = []
+
+#Settings related to enchantments. Format is "enchantment;value", unless stated otherwise.
+[enchantments]
+	#The enchantment rarity of this enchantment. Must be one of common (10), uncommon (5), rare (2) and very_rare (1).
+	rarity = []
+	#The item group this enchantment type's enchanted books are in. As soon as you add one for an item group, you need to re-add every enchantment type for that group as well. Enchantment types are:
+	#vanishable, breakable, wearable, armor, armor_chest, armor_feet, armor_head, armor_legs, weapon, digger, bow, crossbow, fishing_rod, trident
+	group = []
+	#Remove enchantment books from creative tabs. Runs before group, so re-adding is possible.
+	remove_item_groups = false
+
+[composter]
+	#Define additional composter inputs. Format is "itemid;chance", with chance being a percentage between 0.0 and 1.0.
+	inputs = []
+	#Whether to clear the default composter inputs and have the composter inputs only contain the stuff defined here.
+	clear = false
+
+[stripping]
+	#Define additional stripping transitions. Format is "fromid;toid", with both of them being in the modid:blockid format.
+	transitions = []
+	#Whether to clear the default stripping transitions and have the stripping transitions only contain the stuff defined here.
+	clear = false
+
+[pathing]
+	#Define additional pathing transitions. Format is "fromid;toid", with both of them being in the modid:blockid format.
+	transitions = []
+	#Whether to clear the default pathing transitions and have the pathing transitions only contain the stuff defined here.
+	clear = false
+
+[tilling]
+	#Define additional tilling transitions. Format is "fromid;toid", with both of them being in the modid:blockid format.
+	transitions = []
+	#Whether to clear the default tilling transitions and have the tilling transitions only contain the stuff defined here.
+	clear = false
+
+[entities]
+	#Apply entity attribute modifiers on spawning. To get the default value of an attribute, make a superflat world without mob spawning, spawn the desired mob, and run "/attribute @e[type=<entityid>,limit=1] <attributeid> get". Format is "entity;attribute;amount;operation":
+	#entity: the entity id (e.g. minecraft:rabbit)
+	#attribute: the attribute id (e.g. minecraft:generic.max_health)
+	#amount: the amount of the modifier (e.g. 5)
+	#operation: 0 for addition, 1 for multiply base, 2 for multiply total. See https://minecraft.fandom.com/wiki/Attribute for more information
+	modifiers = []
+
+[villager_trading]
+	#Adds new villager trades. villager_x_trades defines the villager level (1-5). Due to technical reasons, if you add trades for a specific profession for a specific level, you need to re-add all trades for that profession level. E. g. if you wanted to add an enchanted book trade to a level 5 librarian, you need to re-add all other trades for a level 5 librarian as well. See https://minecraft.fandom.com/wiki/Trading for the vanilla defaults
+	#Format is profession;uses;xp;pricemultiplier;tradetype;tradetype-specific-args
+	#profession: villager profession (e. g. minecraft:librarian)
+	#uses: how often the trade can be traded before it is locked
+	#xp: the amount of villager xp given to the villager
+	#price multiplier: every time you trade with a villager, the selling price is multiplied with 1 - this value (e. g. 0.1 means that every time you use the trade, the price is lowered by 10%)
+	#tradetype and corresponding tradetype-specific-args can take the following values (values in [] are optional):
+	#  normal: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem;sellItemCount - a normal trade that takes 1 or 2 stacks in and gives 1 stack out. The items are item ids (e. g. minecraft:emerald), the item counts are numbers between 1 and 64
+	#  dyed: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem" - the sell item (e. g. leather armor) will be randomly dyed
+	#  map: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]structure;mapdecoration" - structure is a structure id (e. g. minecraft:stronghold), mapdecoration can be one of the following: "player", "frame", "red_marker", "blue_marker", "target_x", "target_point", "player_off_map", "player_off_limits", "mansion", "monument", "red_x", "banner_black", "banner_blue", "banner_brown", "banner_cyan", "banner_gray", "banner_green", "banner_light_blue", "banner_light_gray", "banner_lime", "banner_magenta", "banner_orange", "banner_pink", "banner_purple", "banner_red", "banner_white", "banner_yellow"
+	#  enchantedbook: buyItem1;[buyItem2;buyItemCount2;]enchantment[;level] - enchantment to use (e. g. minecraft:sharpness, supports regex), level for the level (randomly selected if not stated). Outputs an enchanted book, at which the amount of buyItem1 is scaled - a lvl 5 book costs approx. 5 times more than a lvl 1 book. Adding more than one enchantment is impossible
+	#  enchanteditem: buyItem1;[buyItem2;buyItemCount2;]sellItem;enchantment;level - enchantment to use (e. g. minecraft:sharpness, supports regex), level for the level (randomly selected if not stated). Outputs an enchanted book, at which the amount of buyItem1 is scaled - a lvl 5 helmet costs approx. 5 times more than a lvl 1 helmet. Adding more than one enchantment is impossible
+	#  potion: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem;potion - the potion (supports regex, randomly selects one if multiple fit) is applied to the sell item, so unless you have additional potion-like items added by other mods, this should only be minecraft:potion, minecraft:splash_potion, minecraft:lingering_potion or minecraft:tipped_arrow
+	#  stew: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]effect;duration - effect is an effect id (e. g. minecraft:strength), duration is the duration in ticks
+	villager_1_trades = []
+	villager_2_trades = []
+	villager_3_trades = []
+	villager_4_trades = []
+	villager_5_trades = []
+
+[wandering_trader_trading]
+	#Adds new wandering trader trades. Due to how the wandering trader works, there are two lists: normal and last trades. When the trader spawns, five normal trades and one last trade are each randomly chosen from their corresponding lists. Note that as soon as you add anything in any of the lists, it removes all other trades (including the ones from the other list), and only this mod's added trades remain, so you need to re-add most things if you only want to add one trade. See https://minecraft.fandom.com/wiki/Trading for the vanilla defaults
+	#Format is uses;pricemultiplier;tradetype;tradetype-specific-args
+	#uses: how often the trade can be traded before it is locked
+	#price multiplier: every time you trade with a villager, the selling price is multiplied with 1 - this value (e. g. 0.1 means that every time you use the trade, the price is lowered by 10%)
+	#tradetype and corresponding tradetype-specific-args can take the following values (values in [] are optional):
+	#  normal: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem;sellItemCount - a normal trade that takes 1 or 2 stacks in and gives 1 stack out. The items are item ids (e. g. minecraft:emerald), the item counts are numbers between 1 and 64
+	#  dyed: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem" - the sell item (e. g. leather armor) will be randomly dyed
+	#  map: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]structure;mapdecoration" - structure is a structure id (e. g. minecraft:stronghold), mapdecoration can be one of the following: "player", "frame", "red_marker", "blue_marker", "target_x", "target_point", "player_off_map", "player_off_limits", "mansion", "monument", "red_x", "banner_black", "banner_blue", "banner_brown", "banner_cyan", "banner_gray", "banner_green", "banner_light_blue", "banner_light_gray", "banner_lime", "banner_magenta", "banner_orange", "banner_pink", "banner_purple", "banner_red", "banner_white", "banner_yellow"
+	#  enchantedbook: buyItem1;[buyItem2;buyItemCount2;]enchantment[;level] - enchantment to use (e. g. minecraft:sharpness, supports regex), level for the level (randomly selected if not stated). Outputs an enchanted book, at which the amount of buyItem1 is scaled - a lvl 5 book costs approx. 5 times more than a lvl 1 book. Adding more than one enchantment is impossible
+	#  enchanteditem: buyItem1;[buyItem2;buyItemCount2;]sellItem;enchantment;level - enchantment to use (e. g. minecraft:sharpness, supports regex), level for the level (randomly selected if not stated). Outputs an enchanted book, at which the amount of buyItem1 is scaled - a lvl 5 helmet costs approx. 5 times more than a lvl 1 helmet. Adding more than one enchantment is impossible
+	#  potion: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]sellItem;potion - the potion (supports regex, randomly selects one if multiple fit) is applied to the sell item, so unless you have additional potion-like items added by other mods, this should only be minecraft:potion, minecraft:splash_potion, minecraft:lingering_potion or minecraft:tipped_arrow
+	#  stew: buyItem1;buyItemCount1;[buyItem2;buyItemCount2;]effect;duration - effect is an effect id (e. g. minecraft:strength), duration is the duration in ticks
+	trader_normal_trades = []
+	trader_last_trades = []
+

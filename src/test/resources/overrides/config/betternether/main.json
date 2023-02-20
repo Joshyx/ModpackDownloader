@@ -1,0 +1,15 @@
+{
+  "improvement": {
+    "smaller_armor_offset[def: true]": true,
+    "lavafall_particles[def: true]": true,
+    "fog_density[vanilla: 1.0][def: 0.75]": 0.75
+  },
+  "egg_plant": {
+    "mob_damage[def: true]": true,
+    "player_damage[def: true]": true
+  },
+  "respawn_statue": {
+    "respawn_item[def: minecraft:glowstone]": "minecraft:glowstone",
+    "item_count[def: 4]": 4
+  }
+}
