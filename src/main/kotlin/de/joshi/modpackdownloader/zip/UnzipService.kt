@@ -17,7 +17,7 @@ class UnzipService {
         val zis = ZipInputStream(FileInputStream(zipFile))
         var zipEntry = zis.nextEntry
         while (zipEntry != null) {
-            val newFile: File = newFile(targetDirectory, zipEntry)
+            val newFile: File = createNewFile(targetDirectory, zipEntry)
             if (zipEntry.isDirectory) {
                 if (!newFile.isDirectory && !newFile.mkdirs()) {
                     throw IOException("Failed to create directory $newFile")
@@ -47,7 +47,7 @@ class UnzipService {
         return targetDirectory
     }
 
-    fun newFile(destinationDir: File, zipEntry: ZipEntry): File {
+    fun createNewFile(destinationDir: File, zipEntry: ZipEntry): File {
         val destFile = File(destinationDir, zipEntry.name)
         val destDirPath = destinationDir.canonicalPath
         val destFilePath = destFile.canonicalPath

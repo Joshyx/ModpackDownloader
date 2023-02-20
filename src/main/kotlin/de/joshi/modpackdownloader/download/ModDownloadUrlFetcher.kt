@@ -4,6 +4,11 @@ import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.models.ModData
 import de.joshi.modpackdownloader.models.ModInfo
 import de.joshi.modpackdownloader.models.ReadMeInfo
+import de.joshi.modpackdownloader.util.getString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.lang.RuntimeException
 import java.net.MalformedURLException
@@ -12,6 +17,7 @@ import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.Objects
 
 class ModDownloadUrlFetcher {
     private val LOGGER = KotlinLogging.logger {  }
@@ -20,33 +26,53 @@ class ModDownloadUrlFetcher {
 
         return manifest.files.map {modData ->
             val modInfo = getModInfo(modData)
-            try {
+            if(requireAll || modData.required) {
 
-                if(requireAll || modData.required) {
-                    LOGGER.info("Parsed URL ${modInfo.downloadURL}")
-                    return@map URL(modInfo.downloadURL)
-                } else {
-                    LOGGER.info("Skipping download for ${modInfo.name}: Not required")
+                return@map modInfo.downloadURL ?: {
+                        val error = """
+                        MalformedUrlException: No download URL exists for ${modInfo.name}
+                        - Try downloading it manually instead
+                        - ${getManualDownloadUrl(modData.projectID, modData.fileID)}
+                        - ${modInfo.downloadedInfoString}
+                    """.trimIndent()
+                        ReadMeInfo.errors.add(error)
+                        LOGGER.error(error)
                 }
-            } catch(e: MalformedURLException) {
-                val error = """
-                    $e
-                    - Error with download url for mod ${modInfo.name}
-                    - Try downloading it manually instead.
-                """.trimIndent()
-                ReadMeInfo.errors.add(error)
-                LOGGER.error(error)
+            } else {
+                LOGGER.info("Skipping download for ${modInfo.name}: Not required")
             }
         }.filterIsInstance(URL::class.java)
     }
     fun getModInfo(modData: ModData): ModInfo {
-        val modInfoString = downloadModInfo(modData.projectID, modData.fileID)
-        val name = modInfoString.substringAfter("\"fileName\":\"").substringBefore("\"")
-        val url = modInfoString.substringAfter("\"downloadUrl\":\"").substringBefore("\"")
-        return ModInfo(name, url, modData.required, modInfoString)
+        val modInfo = downloadModInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
+        val name = modInfo["fileName"]!!.getString()
+        var url: URL?
+        try {
+            url = URL(modInfo["downloadUrl"]!!.getString())
+            LOGGER.info { "Parsed URL $url" }
+        } catch (e: MalformedURLException) {
+
+            try {
+                url = URL(getAlternativeDownloadUrl(modInfo))
+                LOGGER.info { "Parsed Fallback URL $url" }
+            } catch (e: MalformedURLException) {
+                url = null
+            }
+        }
+        return ModInfo(name, url, modData.required, modInfo)
     }
-    private fun downloadModInfo(projectId: Int, fileId: Int): String {
-        return getHttpBody("https://api.curseforge.com/v1/mods/$projectId/files/$fileId")
+    private fun downloadModInfo(projectId: Int, fileId: Int): JsonObject {
+        return Json.decodeFromString(getHttpBody("https://api.curseforge.com/v1/mods/$projectId/files/$fileId"))
+    }
+    private fun getAlternativeDownloadUrl(modInfo: JsonObject): String {
+        val id = modInfo["id"]!!.getString()
+        val fileName = modInfo["fileName"]!!.getString()
+        return "https://edge.forgecdn.net/files/${id.substring(0, 4)}/${id.substring(4)}/$fileName"
+    }
+    private fun getManualDownloadUrl(projectId: Int, fileId: Int): String {
+        println(getHttpBody("https://api.curseforge.com/v1/mods/$projectId/"))
+        val modInfo: Map<String, Any> = Json.decodeFromString(getHttpBody("https://api.curseforge.com/v1/mods/$projectId/"))
+        return modInfo.toString()
     }
     private fun getHttpBody(url: String): String {
         val client = HttpClient.newBuilder().build()
