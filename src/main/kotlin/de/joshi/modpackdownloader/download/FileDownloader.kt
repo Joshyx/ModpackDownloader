@@ -12,11 +12,11 @@ import kotlin.io.path.exists
 class FileDownloader {
     private val LOGGER = KotlinLogging.logger {  }
 
-    fun downloadFiles(targetDirectory: File, downloadUrls: List<URL>, emptyDirectory: Boolean = false) {
+    fun downloadFiles(targetDirectory: File, downloadUrls: List<URL>) {
         var filesDownloaded = 0
         val startTime = Instant.now().toEpochMilli()
 
-        prepareTargetDirectory(targetDirectory, emptyDirectory)
+        prepareTargetDirectory(targetDirectory)
 
         for(fileUrl in downloadUrls) {
             filesDownloaded++
@@ -44,7 +44,7 @@ class FileDownloader {
         }
     }
 
-    private fun prepareTargetDirectory(targetDirectory: File, emptyDirectory: Boolean) {
+    private fun prepareTargetDirectory(targetDirectory: File) {
         if (!targetDirectory.exists()) {
             LOGGER.info("Creating directory $targetDirectory to store files in")
             targetDirectory.mkdirs()
@@ -53,14 +53,6 @@ class FileDownloader {
 
         if (!targetDirectory.listFiles().isNullOrEmpty()) {
             return
-        }
-
-        if (emptyDirectory) {
-            LOGGER.warn("Deleting files in directory $targetDirectory. This significantly impacts performance so disable it to make it much faster")
-            targetDirectory.deleteRecursively()
-            targetDirectory.mkdirs()
-        } else {
-            LOGGER.warn("The directory $targetDirectory is not empty, Continuing to save files there. Enable emptyDirectory to automatically delete files")
         }
     }
 }

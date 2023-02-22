@@ -1,0 +1,270 @@
+{
+  "biomes": {
+    "betternether:sulfuric_bone_reef": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:soul_plain": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:old_warped_woods": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:sythian_torrids": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:magma_wastes": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:old_swampland": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:crimson_pinewood": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:flooded_deltas": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "minecraft:basalt_deltas": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:warped_desert": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:wart_forest": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_grasslands": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:subzero_hypogeal": {
+      "weight": 1,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "minecraft:crimson_forest": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:crimson_gardens": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:upside_down_forest": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:crimson_glowing_woods": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_jungle": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:old_fungiwoods": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_mushroom_forest": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:embur_bog": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:withering_woods": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:wailing_garth": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:glowstone_gardens": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_mushroom_forest_edge": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "minecraft:nether_wastes": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_swampland": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:nether_swampland_terraces": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "minecraft:soul_sand_valley": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "minecraft:warped_forest": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:gravel_desert": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:poor_nether_grasslands": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:wart_forest_edge": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:bone_reef": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:weeping_mire": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:quartz_desert": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "betternether:magma_land": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    },
+    "byg:brimstone_caverns": {
+      "weight": 5,
+      "dictionary": [
+        "NETHER"
+      ],
+      "hills": []
+    }
+  }
+}

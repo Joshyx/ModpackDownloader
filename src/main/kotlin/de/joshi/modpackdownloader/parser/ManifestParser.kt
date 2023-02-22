@@ -17,6 +17,7 @@ class ManifestParser {
 
         val manifestFile = modpackFile.getSubfolder("manifest.json")
             ?: throw FileNotFoundException("No manifest.json file could be found in $modpackFile")
+
         LOGGER.info("Reading Manifest File from $manifestFile")
         val manifestData = Json.decodeFromString<ManifestData>(Files.readString(manifestFile.toPath()))
         LOGGER.info("Manifest Info:")
