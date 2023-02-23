@@ -47,8 +47,8 @@ class Main {
         )
 
         val overridesHandler = OverridesHandler()
-        val overridesFolder = overridesHandler.getOverridesFolder(sourceFile, manifest)
-        if (overridesFolder != null) {
+        val overridesFolder = overridesHandler.getOverridesFolder(sourceDirectory, manifest)
+        if (overridesFolder.exists()) {
             overridesHandler.handleOverrides(overridesFolder, targetDirectory)
         }
 
@@ -71,5 +71,5 @@ fun main(args: Array<String>) {
 
     File("$targetDirectory/info.log").delete()
     System.setProperty("moddownloader.logFile.path", "$targetDirectory/info.log")
-    Main().run(sourceFile, targetDirectory, true)
+    Main().run(sourceFile, targetDirectory, false)
 }

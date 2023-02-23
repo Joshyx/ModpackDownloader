@@ -16,7 +16,7 @@ class FileDownloader {
         var filesDownloaded = 0
         val startTime = Instant.now().toEpochMilli()
 
-        prepareTargetDirectory(targetDirectory)
+        targetDirectory.mkdirs()
 
         for(fileUrl in downloadUrls) {
             filesDownloaded++
@@ -34,25 +34,15 @@ class FileDownloader {
         val fileName = fileUrl.file.substringAfterLast("/")
         val destinationFile = Paths.get("$targetDirectory/$fileName")
         LOGGER.info("Downloading file $fileName...")
-        if (!destinationFile.exists()) {
-            fileUrl.openStream().use {
-                Files.copy(it, destinationFile, StandardCopyOption.REPLACE_EXISTING)
-            }
-            LOGGER.info("Saved $fileName to $destinationFile (File $filesDownloaded of ${downloadUrls.size}, ${downloadUrls.size - filesDownloaded} remaining)")
-        } else {
+
+        if (destinationFile.exists()) {
             LOGGER.info("File $fileName already exists. (File $filesDownloaded of ${downloadUrls.size}, ${downloadUrls.size - filesDownloaded} remaining)")
-        }
-    }
-
-    private fun prepareTargetDirectory(targetDirectory: File) {
-        if (!targetDirectory.exists()) {
-            LOGGER.info("Creating directory $targetDirectory to store files in")
-            targetDirectory.mkdirs()
             return
         }
 
-        if (!targetDirectory.listFiles().isNullOrEmpty()) {
-            return
+        fileUrl.openStream().use {
+            Files.copy(it, destinationFile, StandardCopyOption.REPLACE_EXISTING)
         }
+        LOGGER.info("Saved $fileName to $destinationFile (File $filesDownloaded of ${downloadUrls.size}, ${downloadUrls.size - filesDownloaded} remaining)")
     }
 }

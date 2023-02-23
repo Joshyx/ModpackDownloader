@@ -12,11 +12,13 @@ class OverridesHandler {
     fun handleOverrides(overridesFolder: File, targetDirectory: File) {
 
         val foldersToCopy = listOf("mods", "shaderpacks", "resourcepacks")
+        LOGGER.info { "Handling overrides..." }
 
         overridesFolder.listFiles {
                 file -> file.isDirectory
         }?.forEach { file ->
             if(foldersToCopy.any { it == file.name }) {
+                LOGGER.info { "Found override folder ${file.name} to copy" }
                 file.copyRecursively(targetDirectory.getOrCreateSubfolder(file.name), true)
                 for (copiedFile in file.list()!!) {
                     LOGGER.info("Copying $file/$copiedFile to $targetDirectory/${file.name}/$copiedFile")
@@ -29,7 +31,7 @@ class OverridesHandler {
         }
     }
 
-    fun getOverridesFolder(modpackFile: File, manifest: ManifestData): File? {
-        return modpackFile.getSubfolder(manifest.overrides)
+    fun getOverridesFolder(modpackFile: File, manifest: ManifestData): File {
+        return File(modpackFile, manifest.overrides)
     }
 }
