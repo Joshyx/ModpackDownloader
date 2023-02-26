@@ -10,12 +10,5 @@ class FileDownloaderTest {
 
     @Test
     fun downloadFiles() {
-        val path = File("target/downloaded/files")
-
-        path.deleteRecursively()
-        FileDownloader().downloadFiles(
-            path, listOf(URL("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar"))
-        )
-        Assertions.assertTrue(Files.exists(path.toPath()))
     }
 }

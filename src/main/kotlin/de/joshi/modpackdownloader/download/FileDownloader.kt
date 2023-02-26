@@ -1,18 +1,20 @@
 package de.joshi.modpackdownloader.download
 
+import de.joshi.modpackdownloader.auth.CurseforgeApiKey
+import de.joshi.modpackdownloader.http.HttpService
 import mu.KotlinLogging
 import java.io.File
+import java.lang.RuntimeException
 import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import java.time.Instant
-import kotlin.io.path.exists
 
 class FileDownloader {
     private val LOGGER = KotlinLogging.logger {  }
+    private val httpService = HttpService(
+        CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
+    )
 
-    fun downloadFiles(targetDirectory: File, downloadUrls: List<URL>) {
+    fun downloadModFiles(targetDirectory: File, downloadUrls: List<URL>) {
         var filesDownloaded = 0
         val startTime = Instant.now().toEpochMilli()
 
@@ -20,29 +22,9 @@ class FileDownloader {
 
         for(fileUrl in downloadUrls) {
             filesDownloaded++
-            downloadFile(fileUrl, targetDirectory, filesDownloaded, downloadUrls)
+            httpService.downloadFile(fileUrl, targetDirectory)
+            LOGGER.info { "$filesDownloaded out of ${downloadUrls.size} remaining" }
         }
         LOGGER.info("Mod downloads completed, ${downloadUrls.size} files downloaded in ${Instant.now().toEpochMilli() - startTime}ms")
-    }
-
-    private fun downloadFile(
-        fileUrl: URL,
-        targetDirectory: File,
-        filesDownloaded: Int,
-        downloadUrls: List<URL>
-    ) {
-        val fileName = fileUrl.file.substringAfterLast("/")
-        val destinationFile = Paths.get("$targetDirectory/$fileName")
-        LOGGER.info("Downloading file $fileName...")
-
-        if (destinationFile.exists()) {
-            LOGGER.info("File $fileName already exists. (File $filesDownloaded of ${downloadUrls.size}, ${downloadUrls.size - filesDownloaded} remaining)")
-            return
-        }
-
-        fileUrl.openStream().use {
-            Files.copy(it, destinationFile, StandardCopyOption.REPLACE_EXISTING)
-        }
-        LOGGER.info("Saved $fileName to $destinationFile (File $filesDownloaded of ${downloadUrls.size}, ${downloadUrls.size - filesDownloaded} remaining)")
     }
 }

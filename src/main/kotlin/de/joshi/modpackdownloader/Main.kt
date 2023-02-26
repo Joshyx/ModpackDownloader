@@ -1,23 +1,16 @@
 package de.joshi.modpackdownloader
 
-import ch.qos.logback.core.FileAppender
-import ch.qos.logback.core.rolling.RollingFileAppender
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.download.FileDownloader
-import de.joshi.modpackdownloader.download.ModDownloadUrlFetcher
-import de.joshi.modpackdownloader.models.ReadMeInfo
+import de.joshi.modpackdownloader.download.CurseforgeModFetcher
 import de.joshi.modpackdownloader.overrides.OverridesHandler
 import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
 import de.joshi.modpackdownloader.readme.ReadMeMarkdownService
-import de.joshi.modpackdownloader.util.getOrCreateSubfolder
-import de.joshi.modpackdownloader.util.getSubfolder
 import de.joshi.modpackdownloader.zip.UnzipService
 import mu.KotlinLogging
-import mu.toKLogger
 import java.io.File
 import java.time.Instant
-import java.util.logging.LogManager
 
 class Main {
     private val LOGGER = KotlinLogging.logger {  }
@@ -38,10 +31,10 @@ class Main {
         val manifest = ManifestParser().getManifest(sourceDirectory)
 
         val modListDownloadStartTime = Instant.now().toEpochMilli()
-        val modList = ModDownloadUrlFetcher().downloadUrlsForMods(manifest, false)
+        val modList = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
         LOGGER.info("Downloaded ${modList.size} mod URLs in ${Instant.now().toEpochMilli() - modListDownloadStartTime}ms")
 
-        FileDownloader().downloadFiles(
+        FileDownloader().downloadModFiles(
             File(targetDirectory, "mods"),
             modList
         )

@@ -1,6 +1,7 @@
 package de.joshi.modpackdownloader.download
 
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
+import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.models.ModData
 import de.joshi.modpackdownloader.models.ModInfo
@@ -13,21 +14,19 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.lang.RuntimeException
-import java.net.MalformedURLException
-import java.net.URI
 import java.net.URL
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 
-class ModDownloadUrlFetcher {
+class CurseforgeModFetcher {
     private val LOGGER = KotlinLogging.logger {  }
+    private val httpService = HttpService(
+        CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
+    )
 
-    fun downloadUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): List<URL> {
+    fun fetchUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): List<URL> {
 
         return manifest.files.map {modData ->
             try {
-                val modInfo = getModInfo(modData)
+                val modInfo = fetchModInfo(modData)
                 LOGGER.info( "Acquired file info for mod ${modInfo?.name} (Project Id: ${modData.projectID})" )
                 if(requireAll || modData.required) {
 
@@ -36,7 +35,7 @@ class ModDownloadUrlFetcher {
                             """
                                 MalformedUrlException: No download URL exists for ${modInfo?.name}
                                 - Try downloading it manually instead
-                                - ${getManualDownloadUrl(modData.projectID, modData.fileID)}
+                                - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
                                 - ${modInfo?.downloadedInfoString}
                             """
                         )
@@ -55,11 +54,11 @@ class ModDownloadUrlFetcher {
             }
         }.filterIsInstance(URL::class.java)
     }
-    fun getModInfo(modData: ModData): ModInfo? {
+    fun fetchModInfo(modData: ModData): ModInfo? {
         val modInfo = try {
-            downloadFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
+            fetchFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
         } catch (e: Exception) {
-            LOGGER.error("Error with downloading mod info for mod ${modData.projectID}: ${getHttpBody("https://api.curseforge.com/v1/mods/${modData.projectID}/files/${modData.fileID}")}")
+            LOGGER.error("Error with downloading mod info for mod ${modData.projectID}: ${httpService.getHttpBody("https://api.curseforge.com/v1/mods/${modData.projectID}/files/${modData.fileID}")}")
             return null
         }
 
@@ -71,7 +70,7 @@ class ModDownloadUrlFetcher {
         } catch (e: Exception) {
 
             try {
-                url = URL(getAlternativeDownloadUrl(modInfo))
+                url = URL(fetchAlternativeDownloadUrl(modInfo))
                 LOGGER.info { "Parsed Fallback URL $url" }
             } catch (e: Exception) {
                 LOGGER.error { "No url found for mod ${modData.projectID}" }
@@ -80,31 +79,20 @@ class ModDownloadUrlFetcher {
         }
         return ModInfo(name, url, modData.required, modInfo)
     }
-    fun downloadFileInfo(projectId: Int, fileId: Int): JsonObject {
-        return Json.decodeFromString(getHttpBody("https://api.curseforge.com/v1/mods/$projectId/files/$fileId"))
+    fun fetchFileInfo(projectId: Int, fileId: Int): JsonObject {
+        return Json.decodeFromString(httpService.getHttpBody("https://api.curseforge.com/v1/mods/$projectId/files/$fileId"))
     }
-    fun getAlternativeDownloadUrl(modInfo: JsonObject): String {
+    fun fetchAlternativeDownloadUrl(modInfo: JsonObject): String {
         val id = modInfo["id"]!!.getString()
         val fileName = modInfo["fileName"]!!.getString()
         return "https://edge.forgecdn.net/files/${id.substring(0, 4)}/${id.substring(4)}/$fileName"
     }
-    fun getManualDownloadUrl(projectId: Int, fileId: Int): String {
-        val modInfo: JsonObject = Json.decodeFromString(getHttpBody("https://api.curseforge.com/v1/mods/$projectId/"))
+    fun fetchManualDownloadUrl(projectId: Int, fileId: Int): String {
+        val modInfo: JsonObject = Json.decodeFromString(httpService.getHttpBody("https://api.curseforge.com/v1/mods/$projectId/"))
         val modSlugName = modInfo["data"]?.jsonObject?.get("slug")?.getString()
         return "https://www.curseforge.com/minecraft/mc-mods/$modSlugName/download/$fileId"
     }
-    fun getHttpBody(url: String): String {
-        val client = HttpClient.newBuilder().build()
-        val apiKey = CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
-        val request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(url))
-            .header("x-api-key", apiKey)
-            .build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        return response.body()
-    }
     private fun logError(error: String) {
 
         ReadMeInfo.errors.add(error)
