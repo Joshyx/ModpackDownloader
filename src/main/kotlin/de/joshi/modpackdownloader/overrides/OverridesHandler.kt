@@ -2,7 +2,6 @@ package de.joshi.modpackdownloader.overrides
 
 import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.util.getOrCreateSubfolder
-import de.joshi.modpackdownloader.util.getSubfolder
 import mu.KotlinLogging
 import java.io.File
 
