@@ -1,7 +1,6 @@
 package de.joshi.modpackdownloader.readme
 
 import de.joshi.modpackdownloader.models.ManifestData
-import de.joshi.modpackdownloader.models.ReadMeInfo
 import de.joshi.modpackdownloader.util.getOrCreateSubfolder
 import mu.KotlinLogging
 import java.io.File

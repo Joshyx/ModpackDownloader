@@ -1,8 +1,8 @@
 package de.joshi.modpackdownloader
 
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
-import de.joshi.modpackdownloader.download.FileDownloader
 import de.joshi.modpackdownloader.download.CurseforgeModFetcher
+import de.joshi.modpackdownloader.download.FileDownloader
 import de.joshi.modpackdownloader.overrides.OverridesHandler
 import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
@@ -18,7 +18,7 @@ class Main {
     fun run(sourceFile: File, targetDirectory: File, emptyDirectory: Boolean = false) {
         val startTime = Instant.now().toEpochMilli()
         LOGGER.info { "Running ModDownloader from $sourceFile to $targetDirectory" }
-        LOGGER.info { "API Key ${CurseforgeApiKey.getApiKey()} detected" }
+        LOGGER.info { "API Key detected" }
 
         if(emptyDirectory) {
             targetDirectory.deleteRecursively()

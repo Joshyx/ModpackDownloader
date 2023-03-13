@@ -9,8 +9,13 @@ class ModlistService {
 
     fun createModlist(sourceFile: File, targetFile: File, modOverrides: File?) {
 
+        if (!File(sourceFile, "modlist.html").exists()) {
+            LOGGER.warn { "No modlist.html file could be found in $sourceFile" }
+            return
+        }
+
         val lines = Files.readAllLines(File(sourceFile, "modlist.html").toPath())
-        var firstIndex = lines.indexOf("</ul>")
+        val firstIndex = lines.indexOf("</ul>")
         File(modOverrides, "mods").listFiles()?.forEachIndexed { i, file ->
             val modName = file.nameWithoutExtension.replaceFirstChar {it.uppercaseChar()}
             lines.add(

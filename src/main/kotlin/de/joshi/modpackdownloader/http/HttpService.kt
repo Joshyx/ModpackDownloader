@@ -1,9 +1,7 @@
 package de.joshi.modpackdownloader.http
 
-import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import mu.KotlinLogging
 import java.io.File
-import java.lang.RuntimeException
 import java.net.URI
 import java.net.URL
 import java.net.http.HttpClient
@@ -39,7 +37,11 @@ class HttpService(private val apiKey: String) {
             return
         }
 
-        fileUrl.openStream().use {
+        val url = if (fileUrl.toString().contains(" ")) {
+            URL(fileUrl.toString().replace(" ", "%20"))
+        } else fileUrl
+
+        url.openStream().use {
             Files.copy(it, destinationFile, StandardCopyOption.REPLACE_EXISTING)
         }
         LOGGER.info("Saved $fileName to $destinationFile")
