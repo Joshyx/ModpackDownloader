@@ -1,7 +1,7 @@
 package de.joshi.modpackdownloader
 
-import de.joshi.modpackdownloader.auth.CurseforgeApiKey
-import de.joshi.modpackdownloader.download.CurseforgeModFetcher
+import de.joshi.modpackdownloader.auth.CurseForgeApiKey
+import de.joshi.modpackdownloader.download.CurseForgeModFetcher
 import de.joshi.modpackdownloader.download.FileDownloader
 import de.joshi.modpackdownloader.overrides.OverridesHandler
 import de.joshi.modpackdownloader.parser.ManifestParser
@@ -13,30 +13,38 @@ import java.io.File
 import java.time.Instant
 
 class Main {
-    private val LOGGER = KotlinLogging.logger {  }
+
+    companion object {
+        val LOGGER = KotlinLogging.logger { }
+    }
 
     fun run(sourceFile: File, targetDirectory: File, emptyDirectory: Boolean = false) {
         val startTime = Instant.now().toEpochMilli()
         LOGGER.info { "Running ModDownloader from $sourceFile to $targetDirectory" }
         LOGGER.info { "API Key detected" }
 
-        if(emptyDirectory) {
+        if (emptyDirectory) {
             targetDirectory.deleteRecursively()
             targetDirectory.mkdirs()
             LOGGER.info { "Deleted all files in $targetDirectory" }
         }
 
-        val sourceDirectory = UnzipService().unzip(sourceFile, File(targetDirectory, "originalModPack"))
+        val sourceDirectory = if (sourceFile.extension == "zip") {
+            UnzipService().unzip(sourceFile, File(targetDirectory, "originalModPack"))
+        } else sourceFile
 
         val manifest = ManifestParser().getManifest(sourceDirectory)
 
         val modListDownloadStartTime = Instant.now().toEpochMilli()
-        val modList = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
-        LOGGER.info("Downloaded ${modList.size} mod URLs in ${Instant.now().toEpochMilli() - modListDownloadStartTime}ms")
+        val modList = CurseForgeModFetcher().fetchUrlsForMods(manifest, false)
+        LOGGER.info(
+            "Downloaded ${modList.size} mod URLs in ${
+                Instant.now().toEpochMilli() - modListDownloadStartTime
+            }ms"
+        )
 
         FileDownloader().downloadModFiles(
-            File(targetDirectory, "mods"),
-            modList
+            File(targetDirectory, "mods"), modList
         )
 
         val overridesHandler = OverridesHandler()
@@ -53,6 +61,7 @@ class Main {
         LOGGER.info("Process finished in ${Instant.now().toEpochMilli() - startTime}ms")
     }
 }
+
 fun main(args: Array<String>) {
 
     val sourceFile = File(args.getOrNull(0).also {
@@ -60,7 +69,7 @@ fun main(args: Array<String>) {
     }!!)
     val targetDirectory = File(args.getOrNull(1) ?: sourceFile.nameWithoutExtension)
 
-    CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
+    CurseForgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
 
     File("$targetDirectory/info.log").delete()
     System.setProperty("moddownloader.logFile.path", "$targetDirectory/info.log")

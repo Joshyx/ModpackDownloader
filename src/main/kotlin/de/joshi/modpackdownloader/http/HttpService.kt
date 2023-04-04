@@ -1,6 +1,6 @@
 package de.joshi.modpackdownloader.http
 
-import mu.KotlinLogging
+import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import java.io.File
 import java.net.URI
 import java.net.URL
@@ -13,15 +13,10 @@ import java.nio.file.StandardCopyOption
 import kotlin.io.path.exists
 
 class HttpService(private val apiKey: String) {
-    private val LOGGER = KotlinLogging.logger {  }
 
     fun getHttpBody(url: String): String {
         val client = HttpClient.newBuilder().build()
-        val request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(url))
-            .header("x-api-key", apiKey)
-            .build()
+        val request = HttpRequest.newBuilder().GET().uri(URI.create(url)).header("x-api-key", apiKey).build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
         return response.body()
@@ -46,4 +41,5 @@ class HttpService(private val apiKey: String) {
         }
         LOGGER.info("Saved $fileName to $destinationFile")
     }
+
 }

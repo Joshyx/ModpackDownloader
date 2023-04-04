@@ -12,4 +12,4 @@ Overworld:
   NonOTGWorldType: "flat"
   NonOTGGeneratorSettings:
 Dimensions:
-- PresetFolderName: "VanillaVistas"
+  - PresetFolderName: "VanillaVistas"

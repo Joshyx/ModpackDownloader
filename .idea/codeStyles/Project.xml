@@ -1,0 +1,24 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
+    <JetCodeStyleSettings>
+      <option name="ALIGN_IN_COLUMNS_CASE_BRANCH" value="true" />
+      <option name="LBRACE_ON_NEXT_LINE" value="true" />
+      <option name="CONTINUATION_INDENT_IN_IF_CONDITIONS" value="false" />
+    </JetCodeStyleSettings>
+    <ScalaCodeStyleSettings>
+      <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
+    </ScalaCodeStyleSettings>
+    <codeStyleSettings language="kotlin">
+      <option name="KEEP_LINE_BREAKS" value="false" />
+      <option name="ELSE_ON_NEW_LINE" value="true" />
+      <option name="WHILE_ON_NEW_LINE" value="true" />
+      <option name="CATCH_ON_NEW_LINE" value="true" />
+      <option name="FINALLY_ON_NEW_LINE" value="true" />
+      <option name="CALL_PARAMETERS_WRAP" value="5" />
+      <option name="CALL_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="CALL_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+      <option name="VARIABLE_ANNOTATION_WRAP" value="2" />
+    </codeStyleSettings>
+  </code_scheme>
+</component>

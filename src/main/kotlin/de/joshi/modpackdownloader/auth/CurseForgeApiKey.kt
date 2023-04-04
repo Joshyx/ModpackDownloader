@@ -2,10 +2,10 @@ package de.joshi.modpackdownloader.auth
 
 import de.joshi.modpackdownloader.http.HttpService
 
-object CurseforgeApiKey {
+object CurseForgeApiKey {
 
     fun getApiKey(): String? {
-        return if(hasValidApiKey()) System.getenv("CURSEFORGE_API_KEY") ?: null else null
+        return if (hasValidApiKey()) System.getenv("CURSEFORGE_API_KEY") ?: null else null
     }
 
     fun hasValidApiKey(): Boolean {

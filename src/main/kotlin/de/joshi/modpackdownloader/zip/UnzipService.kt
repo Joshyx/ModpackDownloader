@@ -1,6 +1,6 @@
 package de.joshi.modpackdownloader.zip
 
-import mu.KotlinLogging
+import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -10,7 +10,6 @@ import java.util.zip.ZipInputStream
 
 
 class UnzipService {
-    private val LOGGER = KotlinLogging.logger {  }
 
     fun unzip(zipFile: File, targetDirectory: File): File {
         val buffer = ByteArray(1024)
@@ -56,4 +55,5 @@ class UnzipService {
         }
         return destFile
     }
+
 }

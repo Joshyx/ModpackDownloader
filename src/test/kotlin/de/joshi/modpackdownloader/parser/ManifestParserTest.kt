@@ -1,8 +1,8 @@
 package de.joshi.modpackdownloader.parser
 
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -15,6 +15,7 @@ class ManifestParserTest {
             ManifestParser().getManifest(File("sadf/dsajkvxcym/asdas"))
         }
     }
+
     @Test
     fun getManifestSuccessfully() {
         assertDoesNotThrow {

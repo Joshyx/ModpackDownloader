@@ -10,4 +10,4 @@
 Overworld:
   PresetFolderName: "Default"
 Dimensions:
-- PresetFolderName: "VanillaVistas"
+  - PresetFolderName: "VanillaVistas"

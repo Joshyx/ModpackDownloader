@@ -17,4 +17,4 @@ Nether:
 End:
   PresetFolderName: "SkylandsTall"
 Dimensions:
-- PresetFolderName: "VanillaVistas"
+  - PresetFolderName: "VanillaVistas"
