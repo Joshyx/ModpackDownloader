@@ -7,20 +7,25 @@ import de.joshi.modpackdownloader.models.ReadMeInfo
 class ReadMeMarkdownService : ReadMeService {
     override fun createReadMe(manifestData: ManifestData): String {
         return """
+
 # Modpack Info
+
 ## General
-${manifestData.name} ${manifestData.version} by ${manifestData.author.ifBlank { "an unknown author" }}
 
-Minecraft Version: ${manifestData.minecraft.version}
+${manifestData.name} `${manifestData.version}` by ${manifestData.author.ifBlank { "an unknown author" }}
 
-Mod Loader: ${
-            manifestData.minecraft.modLoaders.filter { it.primary }.getOrElse(0) { ModLoaderData("unknown", true) }.id
-        }
+Minecraft Version: `${manifestData.minecraft.version}`
 
-Mod Count: ${manifestData.files.size}
+Mod Loader: `${manifestData.minecraft.modLoaders.filter { it.primary }.getOrElse(0) { ModLoaderData("unknown", true) }.id}`
+
+Mod Count: `${manifestData.files.size}`
 
 ## Errors
-${ReadMeInfo.errors.joinToString("\n\n")}
+
+```cmd
+${ReadMeInfo.errors.joinToString("\n```\n\n```cmd\n").replace("\t", "    ")}
+```
+
         """.trimIndent()
     }
 
