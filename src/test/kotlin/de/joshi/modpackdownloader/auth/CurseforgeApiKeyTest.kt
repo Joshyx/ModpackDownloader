@@ -4,19 +4,19 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
-class CurseForgeApiKeyTest {
+class CurseforgeApiKeyTest {
     @Test
     fun isApiKeyValidReturnsFalse() {
-        assertFalse(CurseForgeApiKey.isApiKeyValid("hallo"))
+        assertFalse(CurseforgeApiKey.isApiKeyValid("hallo"))
     }
 
     @Test
     fun getApiKeyReturnsNotNull() {
-        assertNotNull(CurseForgeApiKey.getApiKey())
+        assertNotNull(CurseforgeApiKey.getApiKey())
     }
 
     @Test
     fun hasValidApiKeyReturnsTrue() {
-        assert(CurseForgeApiKey.hasValidApiKey())
+        assert(CurseforgeApiKey.hasValidApiKey())
     }
 }

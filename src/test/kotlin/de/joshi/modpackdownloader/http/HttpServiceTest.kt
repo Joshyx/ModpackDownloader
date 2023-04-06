@@ -18,7 +18,7 @@ class HttpServiceTest {
     }
 
     @Test
-    fun downloadFile() {
+    fun getFile() {
         val path = File("test/downloaded/")
 
         path.deleteRecursively()

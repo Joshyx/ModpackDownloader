@@ -7,7 +7,6 @@ class OverridesHandlerTest {
 
     @Test
     fun handleOverrides() {
-
         val inputFile = File("src/test/resources/modpack/overrides")
         val outputFile = File("target/test/overrides/")
         OverridesHandler().handleOverrides(inputFile, outputFile)

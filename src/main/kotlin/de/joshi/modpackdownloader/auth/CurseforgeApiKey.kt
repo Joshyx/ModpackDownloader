@@ -2,7 +2,7 @@ package de.joshi.modpackdownloader.auth
 
 import de.joshi.modpackdownloader.http.HttpService
 
-object CurseForgeApiKey {
+object CurseforgeApiKey {
 
     fun getApiKey(): String? {
         return if (hasValidApiKey()) System.getenv("CURSEFORGE_API_KEY") ?: null else null

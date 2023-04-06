@@ -1,21 +1,37 @@
 package de.joshi.modpackdownloader
 
-import de.joshi.modpackdownloader.auth.CurseForgeApiKey
-import de.joshi.modpackdownloader.download.CurseForgeModFetcher
+import de.joshi.modpackdownloader.auth.CurseforgeApiKey
+import de.joshi.modpackdownloader.download.CurseforgeModFetcher
 import de.joshi.modpackdownloader.download.FileDownloader
 import de.joshi.modpackdownloader.overrides.OverridesHandler
 import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
 import de.joshi.modpackdownloader.readme.ReadMeMarkdownService
 import de.joshi.modpackdownloader.zip.UnzipService
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
 import mu.KotlinLogging
 import java.io.File
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class Main {
 
     companion object {
         val LOGGER = KotlinLogging.logger { }
+        val client = HttpClient(OkHttp) {
+            install(HttpTimeout) {
+                socketTimeoutMillis = 600000
+            }
+            engine {
+                threadsCount = 30
+                pipelining = true
+                config {
+                    retryOnConnectionFailure(true)
+                }
+            }
+        }
     }
 
     fun run(sourceFile: File, targetDirectory: File, emptyDirectory: Boolean = false) {
@@ -36,17 +52,19 @@ class Main {
         val manifest = ManifestParser().getManifest(sourceDirectory)
 
         val modListDownloadStartTime = Instant.now().toEpochMilli()
-        val modList = CurseForgeModFetcher().fetchUrlsForMods(manifest, false)
+
+        // Fetch URLs
+        val modList = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
+
         LOGGER.info(
-            "Downloaded ${modList.size} mod URLs in ${
-                Instant.now().toEpochMilli() - modListDownloadStartTime
-            }ms"
+            "Fetched ${modList.size} mod URLs in ${Instant.now().toEpochMilli() - modListDownloadStartTime}ms " +
+                    "( ${TimeUnit.MILLISECONDS.toSeconds(Instant.now().toEpochMilli() - modListDownloadStartTime)}sec )"
         )
 
-        FileDownloader().downloadModFiles(
-            File(targetDirectory, "mods"), modList
-        )
+        // Download mods
+        FileDownloader().downloadModFiles(File(targetDirectory, "mods"), modList)
 
+        // Handle overrides
         val overridesHandler = OverridesHandler()
         val overridesFolder = overridesHandler.getOverridesFolder(sourceDirectory, manifest)
         if (overridesFolder.exists()) {
@@ -58,7 +76,9 @@ class Main {
 
         LOGGER.info("COMPLETED")
         LOGGER.info("Saved all files to $targetDirectory")
-        LOGGER.info("Process finished in ${Instant.now().toEpochMilli() - startTime}ms")
+        LOGGER.info("Process finished in ${Instant.now().toEpochMilli() - startTime}ms " +
+                "( ~${TimeUnit.MILLISECONDS.toMinutes(Instant.now().toEpochMilli() - startTime)}min )"
+        )
     }
 }
 
@@ -69,9 +89,11 @@ fun main(args: Array<String>) {
     }!!)
     val targetDirectory = File(args.getOrNull(1) ?: sourceFile.nameWithoutExtension)
 
-    CurseForgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
+    CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
 
+    // Logback
     File("$targetDirectory/info.log").delete()
     System.setProperty("moddownloader.logFile.path", "$targetDirectory/info.log")
+
     Main().run(sourceFile, targetDirectory, false)
 }

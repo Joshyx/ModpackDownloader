@@ -1,7 +1,7 @@
 package de.joshi.modpackdownloader.download
 
 import de.joshi.modpackdownloader.Main.Companion.LOGGER
-import de.joshi.modpackdownloader.auth.CurseForgeApiKey
+import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.models.ModData
@@ -15,14 +15,13 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import java.net.URL
 
-class CurseForgeModFetcher {
+class CurseforgeModFetcher {
 
     private val httpService = HttpService(
-        CurseForgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
+        CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
     )
 
     fun fetchUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): List<URL> {
-
         return manifest.files.map { modData ->
             try {
                 val modInfo = fetchModInfo(modData)
@@ -45,10 +44,10 @@ class CurseForgeModFetcher {
             } catch (e: SerializationException) {
                 logError(
                     """
-                            Error downloading mod with id ${modData.projectID}.
-                            - Does this mod even exist?
-                            - Try downloading it manually instead
-                        """
+                        Error downloading mod with id ${modData.projectID}.
+                        - Does this mod even exist?
+                        - Try downloading it manually instead
+                    """
                 )
             }
         }.filterIsInstance(URL::class.java)
@@ -59,6 +58,7 @@ class CurseForgeModFetcher {
             fetchFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
         } catch (e: Exception) {
             LOGGER.error("Error with downloading mod info for mod ${modData.projectID}: ${httpService.getHttpBody("https://api.curseforge.com/v1/mods/${modData.projectID}/files/${modData.fileID}")}")
+            logError("Error with downloading mod info for mod with ID: ${modData.projectID}")
             return null
         }
 
@@ -73,7 +73,7 @@ class CurseForgeModFetcher {
                 url = URL(fetchAlternativeDownloadUrl(modInfo))
                 LOGGER.info { "Parsed Fallback URL $url" }
             } catch (e: Exception) {
-                LOGGER.error { "No url found for mod ${modData.projectID}" }
+                logError("No url found for mod ${modData.projectID}")
                 url = null
             }
         }
@@ -98,7 +98,6 @@ class CurseForgeModFetcher {
     }
 
     private fun logError(error: String) {
-
         ReadMeInfo.errors.add(error)
         LOGGER.error(error)
     }
