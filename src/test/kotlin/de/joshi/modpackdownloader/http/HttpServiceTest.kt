@@ -1,11 +1,8 @@
 package de.joshi.modpackdownloader.http
 
-import de.joshi.modpackdownloader.download.CurseforgeModFetcher
 import de.joshi.modpackdownloader.download.FileDownloader
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -16,14 +13,12 @@ class HttpServiceTest {
     @Test
     fun getHttpBody() {
         assertContains(
-            HttpService("").getHttpBody("https://example.com"),
-            "<!DOCTYPE html>",
-            true
+            HttpService.getHttpBody("https://example.com"), "<!DOCTYPE html>", true
         )
     }
 
     @Test
-    fun downloadFile() {
+    fun getFile() {
         val path = File("test/downloaded/")
 
         path.deleteRecursively()

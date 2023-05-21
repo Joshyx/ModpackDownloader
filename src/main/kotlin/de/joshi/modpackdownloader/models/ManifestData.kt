@@ -3,7 +3,7 @@ package de.joshi.modpackdownloader.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ManifestData (
+data class ManifestData(
     val minecraft: MinecraftData,
     val manifestType: String,
     val manifestVersion: Double,
@@ -15,19 +15,19 @@ data class ManifestData (
 )
 
 @Serializable
-data class MinecraftData (
+data class MinecraftData(
     val version: String,
     val modLoaders: List<ModLoaderData>,
 )
 
 @Serializable
-data class ModLoaderData (
+data class ModLoaderData(
     val id: String,
     val primary: Boolean,
 )
 
 @Serializable
-data class ModData (
+data class ModData(
     val projectID: Int,
     val fileID: Int,
     val required: Boolean,

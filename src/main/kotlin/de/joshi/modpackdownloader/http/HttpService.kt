@@ -1,49 +1,77 @@
 package de.joshi.modpackdownloader.http
 
-import mu.KotlinLogging
+import de.joshi.modpackdownloader.Main.Companion.LOGGER
+import de.joshi.modpackdownloader.Main.Companion.client
+import de.joshi.modpackdownloader.auth.CurseforgeApiKey
+import de.joshi.modpackdownloader.models.FileData
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.net.URI
 import java.net.URL
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
 import kotlin.io.path.exists
 
-class HttpService(private val apiKey: String) {
-    private val LOGGER = KotlinLogging.logger {  }
+object HttpService {
 
-    fun getHttpBody(url: String): String {
-        val client = HttpClient.newBuilder().build()
-        val request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(url))
-            .header("x-api-key", apiKey)
-            .build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    private val filesDownloaded = mutableMapOf<String, String>()
+    private var skippedCount = 0
+    private var previousProgress = 0
 
-        return response.body()
+    fun getHttpBody(url: String, vararg apiKey: String?): String {
+        return runBlocking {
+            val httpResponse: HttpResponse = client.get(url) {
+                headers {
+                    apiKey.getOrNull(0)?.let {
+                        append("x-api-key", it)
+                    } ?: run {
+                        CurseforgeApiKey.getApiKey()?.let { append("x-api-key", it) }
+                    }
+                }
+            }
+            return@runBlocking httpResponse.body<String>()
+        }
     }
 
-    fun downloadFile(fileUrl: URL, targetDirectory: File) {
-        val fileName = fileUrl.file.substringAfterLast("/")
-        val destinationFile = Paths.get("$targetDirectory/$fileName")
-        LOGGER.info("Downloading file $fileName...")
+    /**
+     * Starts downloading a file if the file does not already exist on the path.
+     */
+    suspend fun getFile(fileUrl: URL, targetDirectory: File, fileCount: Int): FileData? = withContext(Dispatchers.IO) {
+        val fileName: String = fileUrl.file.substringAfterLast("/")
+        val destinationFile: Path = Paths.get("$targetDirectory/$fileName")
 
         if (destinationFile.exists()) {
-            LOGGER.info("File $fileName already exists")
-            return
+            LOGGER.info("Skipping $fileName, already exist")
+            skippedCount += 1
+            return@withContext null
         }
 
-        val url = if (fileUrl.toString().contains(" ")) {
-            URL(fileUrl.toString().replace(" ", "%20"))
-        } else fileUrl
+        val url: String = if (fileUrl.toString().contains(" ")) {
+            fileUrl.toString().replace(" ", "%20")
+        } else fileUrl.toString()
 
-        url.openStream().use {
-            Files.copy(it, destinationFile, StandardCopyOption.REPLACE_EXISTING)
+        val httpResponse: HttpResponse = client.get(url) {
+
+            onDownload { min, max ->
+                val progress = filesDownloaded.size * 100 / (fileCount - skippedCount)
+
+                if ((min * 100 / max) > 90 && url !in filesDownloaded) {
+                    LOGGER.info("Downloading $fileName")
+                    filesDownloaded[url] = fileName
+                }
+
+                if (progress != previousProgress && progress == 100) LOGGER.info("Done!")
+
+                previousProgress = progress
+            }
         }
-        LOGGER.info("Saved $fileName to $destinationFile")
+        val responseBody: ByteArray = httpResponse.body()
+
+        return@withContext FileData(fileName, responseBody, destinationFile)
     }
 }

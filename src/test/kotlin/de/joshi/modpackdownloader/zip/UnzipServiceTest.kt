@@ -1,10 +1,8 @@
 package de.joshi.modpackdownloader.zip
 
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
-import java.util.zip.ZipFile
 
 class UnzipServiceTest {
 

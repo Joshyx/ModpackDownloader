@@ -6,10 +6,10 @@ import de.joshi.modpackdownloader.models.ModData
 import de.joshi.modpackdownloader.models.ModLoaderData
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.net.URL
-import kotlin.test.assertContains
 import kotlin.test.assertContentEquals
 
 class CurseforgeModFetcherTest {
@@ -22,8 +22,7 @@ class CurseforgeModFetcherTest {
                 URL("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar"),
                 URL("https://edge.forgecdn.net/files/3695/126/TConstruct-1.16.5-3.3.4.335.jar"),
                 URL("https://edge.forgecdn.net/files/3969/615/upgradedcore-1.16.5-1.1.0.3-release.jar"),
-            ),
-            CurseforgeModFetcher().fetchUrlsForMods(
+            ), CurseforgeModFetcher().fetchUrlsForMods(
                 ManifestData(
                     MinecraftData("", listOf(ModLoaderData("", false))),
                     "",
@@ -51,6 +50,7 @@ class CurseforgeModFetcherTest {
             CurseforgeModFetcher().fetchModInfo(ModData(566700, 3969615, true))?.name
         )
     }
+
     @Test
     fun getModInfoWithError() {
 
@@ -58,10 +58,12 @@ class CurseforgeModFetcherTest {
             CurseforgeModFetcher().fetchModInfo(ModData(12343, 324134534, true))?.downloadURL
         )
     }
+
     @Test
     fun downloadFileInfo() {
         assert(!CurseforgeModFetcher().fetchFileInfo(566700, 3969615).isEmpty())
     }
+
     @Test
     fun getAlternativeDownloadUrl() {
         assertEquals(
@@ -69,6 +71,7 @@ class CurseforgeModFetcherTest {
             CurseforgeModFetcher().fetchAlternativeDownloadUrl(Json.decodeFromString("{\"id\":\"1234567\", \"fileName\":\"myfile.jar\"}"))
         )
     }
+
     @Test
     fun getManualDownloadUrl() {
         assertEquals(

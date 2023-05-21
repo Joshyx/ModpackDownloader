@@ -19,18 +19,18 @@ Nether:
 End:
   PresetFolderName: "Skylands"
 Dimensions:
-- PresetFolderName: "Wildlands"
-  Seed: 14
-  PortalColor: "beige"
-  PortalMob: "minecraft:zombified_piglin"
-  PortalIgnitionSource: "minecraft:flint_and_steel"
-  PortalBlocks: "minecraft:redstone_block"
-- PresetFolderName: "VanillaVistas"
-  Seed: 14
-  PortalColor: "gold"
-  PortalMob: "minecraft:zombified_piglin"
-  PortalIgnitionSource: "minecraft:flint_and_steel"
-  PortalBlocks: "minecraft:diamond_block"  
+  - PresetFolderName: "Wildlands"
+    Seed: 14
+    PortalColor: "beige"
+    PortalMob: "minecraft:zombified_piglin"
+    PortalIgnitionSource: "minecraft:flint_and_steel"
+    PortalBlocks: "minecraft:redstone_block"
+  - PresetFolderName: "VanillaVistas"
+    Seed: 14
+    PortalColor: "gold"
+    PortalMob: "minecraft:zombified_piglin"
+    PortalIgnitionSource: "minecraft:flint_and_steel"
+    PortalBlocks: "minecraft:diamond_block"
 Settings:
   GenerateStructures: true
   BonusChest: false

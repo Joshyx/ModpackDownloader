@@ -1,6 +1,7 @@
 package de.joshi.modpackdownloader
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileNotFoundException
@@ -16,16 +17,13 @@ class ApplicationIT {
             main(arrayOf("src/test/resources/modpack.zip", outputDirectory))
         }
         assertContains(
-            File(outputDirectory).list() as Array<String>,
-            "mods"
+            File(outputDirectory).list() as Array<String>, "mods"
         )
         assertContains(
-            File(outputDirectory).list() as Array<String>,
-            "originalModPack"
+            File(outputDirectory).list() as Array<String>, "originalModPack"
         )
         assertContains(
-            File(outputDirectory).list() as Array<String>,
-            "README.md"
+            File(outputDirectory).list() as Array<String>, "README.md"
         )
     }
 

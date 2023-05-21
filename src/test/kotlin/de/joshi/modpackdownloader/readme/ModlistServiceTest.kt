@@ -1,8 +1,6 @@
 package de.joshi.modpackdownloader.readme
 
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
 
 class ModlistServiceTest {
@@ -11,9 +9,7 @@ class ModlistServiceTest {
     fun createModlist() {
 
         ModlistService().createModlist(
-            File("src/test/resources/modpack/"),
-            File("target/test/"),
-            File("src/test/resources/modpack/overrides/")
+            File("src/test/resources/modpack/"), File("target/test/"), File("src/test/resources/modpack/overrides/")
         )
     }
 }
