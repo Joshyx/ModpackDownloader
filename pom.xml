@@ -6,7 +6,7 @@
 
     <artifactId>ModpackDownloader</artifactId>
     <groupId>de.joshi.modpackdownloader</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>consoleApp</name>
