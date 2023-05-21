@@ -13,7 +13,7 @@ class HttpServiceTest {
     @Test
     fun getHttpBody() {
         assertContains(
-            HttpService("").getHttpBody("https://example.com"), "<!DOCTYPE html>", true
+            HttpService.getHttpBody("https://example.com"), "<!DOCTYPE html>", true
         )
     }
 

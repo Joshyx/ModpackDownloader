@@ -16,7 +16,9 @@ ${manifestData.name} `${manifestData.version}` by ${manifestData.author.ifBlank 
 
 Minecraft Version: `${manifestData.minecraft.version}`
 
-Mod Loader: `${manifestData.minecraft.modLoaders.filter { it.primary }.getOrElse(0) { ModLoaderData("unknown", true) }.id}`
+Mod Loader: `${
+            manifestData.minecraft.modLoaders.filter { it.primary }.getOrElse(0) { ModLoaderData("unknown", true) }.id
+        }`
 
 Mod Count: `${manifestData.files.size}`
 
@@ -30,6 +32,6 @@ ${ReadMeInfo.errors.joinToString("\n```\n\n```cmd\n").replace("\t", "    ")}
     }
 
     override fun getFileName(): String {
-        return "README.md"
+        return "MODPACK_INFO.md"
     }
 }

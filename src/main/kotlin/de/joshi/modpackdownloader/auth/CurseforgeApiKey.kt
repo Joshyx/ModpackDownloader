@@ -13,6 +13,6 @@ object CurseforgeApiKey {
     }
 
     fun isApiKeyValid(apiKey: String): Boolean {
-        return HttpService(apiKey).getHttpBody("https://api.curseforge.com/v1/games").isNotBlank()
+        return HttpService.getHttpBody("https://api.curseforge.com/v1/games", apiKey).isNotBlank()
     }
 }

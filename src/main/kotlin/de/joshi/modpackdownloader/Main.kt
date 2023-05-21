@@ -8,13 +8,23 @@ import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
 import de.joshi.modpackdownloader.readme.ReadMeMarkdownService
 import de.joshi.modpackdownloader.zip.UnzipService
+import io.github.oshai.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
-import mu.KotlinLogging
 import java.io.File
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
+
+fun main(args: Array<String>) {
+    val sourceFile = File(args.getOrNull(0).also {
+        if (it.isNullOrEmpty()) throw IllegalArgumentException("The source directory cannot be null or empty")
+    }!!)
+    val targetDirectory = File(args.getOrNull(1) ?: sourceFile.nameWithoutExtension)
+
+    Main().run(sourceFile, targetDirectory, false)
+}
 
 class Main {
 
@@ -32,12 +42,20 @@ class Main {
                 }
             }
         }
+        lateinit var baseURL: String
     }
 
     fun run(sourceFile: File, targetDirectory: File, emptyDirectory: Boolean = false) {
         val startTime = Instant.now().toEpochMilli()
         LOGGER.info { "Running ModDownloader from $sourceFile to $targetDirectory" }
-        LOGGER.info { "API Key detected" }
+
+        if (CurseforgeApiKey.hasValidApiKey()) {
+            baseURL = "https://api.curseforge.com"
+            LOGGER.info { "API Key detected" }
+        } else {
+            baseURL = "https://cfproxy.bmpm.workers.dev"
+            LOGGER.info { "API Key not detected, using cfproxy" }
+        }
 
         if (emptyDirectory) {
             targetDirectory.deleteRecursively()
@@ -76,24 +94,11 @@ class Main {
 
         LOGGER.info("COMPLETED")
         LOGGER.info("Saved all files to $targetDirectory")
-        LOGGER.info("Process finished in ${Instant.now().toEpochMilli() - startTime}ms " +
-                "( ~${TimeUnit.MILLISECONDS.toMinutes(Instant.now().toEpochMilli() - startTime)}min )"
+        LOGGER.info(
+            "Process finished in ${Instant.now().toEpochMilli() - startTime}ms " +
+                    "( ~${TimeUnit.MILLISECONDS.toMinutes(Instant.now().toEpochMilli() - startTime)}min )"
         )
+
+        exitProcess(0)
     }
-}
-
-fun main(args: Array<String>) {
-
-    val sourceFile = File(args.getOrNull(0).also {
-        if (it.isNullOrEmpty()) throw IllegalArgumentException("The source directory cannot be null or empty")
-    }!!)
-    val targetDirectory = File(args.getOrNull(1) ?: sourceFile.nameWithoutExtension)
-
-    CurseforgeApiKey.getApiKey() ?: throw RuntimeException("No Value found for env CURSEFORGE_API_KEY")
-
-    // Logback
-    File("$targetDirectory/info.log").delete()
-    System.setProperty("moddownloader.logFile.path", "$targetDirectory/info.log")
-
-    Main().run(sourceFile, targetDirectory, false)
 }
