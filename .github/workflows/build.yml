@@ -3,10 +3,10 @@ run-name: "Build #${{ github.run_number }}"
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
+    branches:
+      - main
   pull_request:
     branches:
       - main
