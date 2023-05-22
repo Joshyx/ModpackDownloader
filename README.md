@@ -2,7 +2,11 @@
 
 [![Build](https://github.com/Joshyx/ModpackDownloader/actions/workflows/build.yml/badge.svg)](https://github.com/Joshyx/ModpackDownloader/actions/workflows/build.yml)
 
-A commandline interface for downloading all mods from a CurseForge modpack.
+A command-line interface for downloading all mods from a CurseForge modpack.
+
+- Simple to use.
+- Mod downloading is done asynchronously and checks whether the file doesn't already exist in the output folder.
+- Resource packs and overrides are handled properly.
 
 ## Usage
 - Run the program with the first argument being the path of your modpack and the second one your destination path:
