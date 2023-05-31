@@ -11,7 +11,7 @@ A command-line interface for downloading all mods from a CurseForge modpack.
 ## Usage
 - Run the program with the first argument being the path of your modpack and the second one your destination path:
    ```cmd
-   java -jar ModpackDownloader-1.1.jar {{folder_or_zip_with_manifest}} {{destination_path}}
+   java -jar ModpackDownloader-1.2.jar {{folder_or_zip_with_manifest}} {{destination_path}}
    ```
 
 - Optionally you can create and define you own API key:
