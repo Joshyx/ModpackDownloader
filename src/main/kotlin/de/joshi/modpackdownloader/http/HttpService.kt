@@ -2,8 +2,10 @@ package de.joshi.modpackdownloader.http
 
 import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.Main.Companion.client
+import de.joshi.modpackdownloader.Main.Companion.usedDirectories
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.models.FileData
+import de.joshi.modpackdownloader.models.ModCategory
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -41,11 +43,14 @@ object HttpService {
     /**
      * Starts downloading a file if the file does not already exist on the path.
      */
-    suspend fun getFile(fileUrl: URL, targetDirectory: File, fileCount: Int): FileData? = withContext(Dispatchers.IO) {
+    suspend fun getFile(fileUrl: URL, targetDirectory: File, category: ModCategory, fileCount: Int): FileData? = withContext(Dispatchers.IO) {
         val fileName: String = fileUrl.file.substringAfterLast("/")
-        val destinationFile: Path = Paths.get("$targetDirectory/$fileName")
+        val parentDirectory = File(targetDirectory, category.getFolderName())
+        val destination: Path = Paths.get("$parentDirectory/$fileName")
 
-        if (destinationFile.exists()) {
+        if (parentDirectory !in usedDirectories) usedDirectories.add(parentDirectory)
+
+        if (destination.exists()) {
             LOGGER.info("Skipping $fileName, already exist")
             skippedCount += 1
             return@withContext null
@@ -72,6 +77,6 @@ object HttpService {
         }
         val responseBody: ByteArray = httpResponse.body()
 
-        return@withContext FileData(fileName, responseBody, destinationFile)
+        return@withContext FileData(fileName, responseBody, destination, parentDirectory)
     }
 }

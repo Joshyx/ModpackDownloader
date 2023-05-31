@@ -11,24 +11,24 @@ data class ManifestData(
     val version: String,
     val author: String,
     val files: List<ModData>,
-    val overrides: String,
+    val overrides: String
 )
 
 @Serializable
 data class MinecraftData(
     val version: String,
-    val modLoaders: List<ModLoaderData>,
+    val modLoaders: List<ModLoaderData>
 )
 
 @Serializable
 data class ModLoaderData(
     val id: String,
-    val primary: Boolean,
+    val primary: Boolean
 )
 
 @Serializable
 data class ModData(
     val projectID: Int,
     val fileID: Int,
-    val required: Boolean,
+    val required: Boolean
 )

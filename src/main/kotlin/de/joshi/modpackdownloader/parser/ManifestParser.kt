@@ -35,7 +35,7 @@ class ManifestParser {
             }.id
         }"
         )
-        LOGGER.info("Containing ${manifestData.files.size} mods")
+        LOGGER.info("Containing ${manifestData.files.size} files")
         return manifestData
     }
 

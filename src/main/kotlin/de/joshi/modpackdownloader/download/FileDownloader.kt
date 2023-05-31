@@ -1,9 +1,13 @@
 package de.joshi.modpackdownloader.download
 
 import de.joshi.modpackdownloader.Main.Companion.LOGGER
+import de.joshi.modpackdownloader.Main.Companion.fileNames
+import de.joshi.modpackdownloader.Main.Companion.usedDirectories
 import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.FileData
+import de.joshi.modpackdownloader.models.ModCategory
 import de.joshi.modpackdownloader.models.ReadMeInfo
+import de.joshi.modpackdownloader.util.getSubfolder
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -14,22 +18,18 @@ import java.util.concurrent.TimeUnit
 import kotlin.io.path.writeBytes
 
 class FileDownloader {
-
-    fun downloadModFiles(targetDirectory: File, downloadUrls: List<URL>) {
+    fun downloadModFiles(targetDirectory: File, downloadUrls: Map<URL, ModCategory>) {
         val startTime = Instant.now().toEpochMilli()
         val files = mutableListOf<FileData>()
-        val fileNames = mutableListOf<String>()
 
         LOGGER.info { "Downloading files..." }
 
         runBlocking {
-            for (fileUrl in downloadUrls) {
+            downloadUrls.forEach { (fileUrl, category) ->
                 launch {
                     try {
-                        HttpService.getFile(fileUrl, targetDirectory, downloadUrls.size)?.let {
+                        HttpService.getFile(fileUrl, targetDirectory, category, downloadUrls.size)?.let {
                             files.add(it)
-                        } ?: run {
-                            fileNames.add(fileUrl.file.substringAfterLast("/"))
                         }
                     } catch (e: IOException) {
                         e.printStackTrace()
@@ -39,24 +39,25 @@ class FileDownloader {
             }
         }
 
-        targetDirectory.mkdirs()
+        usedDirectories.forEach(File::mkdirs)
 
-        // Save files
-        files.forEach { (fileName, responseBody, destinationFile) ->
-            destinationFile.writeBytes(responseBody)
-            fileNames.add(fileName)
-            LOGGER.info("Saved $fileName to $destinationFile")
+        files.forEach { file ->
+            file.destination.writeBytes(file.responseBody)
+            if (file.name !in fileNames) fileNames.add(file.name)
+            LOGGER.info("Saved ${file.name} to ${file.destination}")
         }
 
-        // Remove other files
-        targetDirectory.listFiles()?.forEach { file ->
-            if (file.name !in fileNames) {
-                file.delete()
+        listOf("mods", "resourcepacks", "shaderpacks").forEach { subfolder ->
+            targetDirectory.getSubfolder(subfolder)?.listFiles()?.forEach { file ->
+                if (file.name !in fileNames) {
+                    file.delete()
+                    LOGGER.info("Removed $file from $subfolder")
+                }
             }
         }
 
         LOGGER.info(
-            "Mod downloads completed, ${files.size} files downloaded in ${
+            "File downloads completed, ${files.size} files downloaded in ${
                 Instant.now().toEpochMilli() - startTime
             }ms " +
                     "( ~${TimeUnit.MILLISECONDS.toMinutes(Instant.now().toEpochMilli() - startTime)}min )"

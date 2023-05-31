@@ -3,14 +3,13 @@ package de.joshi.modpackdownloader.overrides
 import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.util.getOrCreateSubfolder
-import de.joshi.modpackdownloader.util.getSubfolder
 import java.io.File
 
 class OverridesHandler {
 
     fun handleOverrides(overridesFolder: File, targetDirectory: File) {
 
-        val foldersToCopy = listOf("mods", "shaderpacks", "resourcepacks")
+        val foldersToCopy = listOf("mods", "resourcepacks", "shaderpacks")
         LOGGER.info { "Handling overrides..." }
 
         overridesFolder.listFiles { file ->
@@ -27,13 +26,6 @@ class OverridesHandler {
             } else {
                 LOGGER.warn("There is an override for some files in $file that is not automatically dealt with by this program")
             }
-        }
-
-        targetDirectory.getSubfolder("mods")?.listFiles { file ->
-            file.extension == "zip"
-        }?.forEach { file ->
-            file.copyTo(targetDirectory.getOrCreateSubfolder("resourcepacks/${file.name}"), true)
-            file.delete()
         }
     }
 

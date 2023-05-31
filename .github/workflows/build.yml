@@ -24,7 +24,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-      - run: mvn -Dmaven.test.skip=true --batch-mode --update-snapshots package
+      - run: mvn --batch-mode --update-snapshots -DskipTests=true package
       - run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v3
         with:

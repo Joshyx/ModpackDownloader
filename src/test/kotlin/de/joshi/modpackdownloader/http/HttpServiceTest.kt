@@ -1,6 +1,7 @@
 package de.joshi.modpackdownloader.http
 
 import de.joshi.modpackdownloader.download.FileDownloader
+import de.joshi.modpackdownloader.models.ModCategory
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -23,7 +24,7 @@ class HttpServiceTest {
 
         path.deleteRecursively()
         FileDownloader().downloadModFiles(
-            path, listOf(URL("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar"))
+            path, mapOf(URL("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar") to ModCategory.MOD)
         )
         assertTrue(Files.exists(path.toPath()))
     }

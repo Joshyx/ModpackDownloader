@@ -1,11 +1,13 @@
 package de.joshi.modpackdownloader.models
 
+import java.io.File
 import java.nio.file.Path
 
 data class FileData(
-    val fileName: String,
+    val name: String,
     val responseBody: ByteArray,
-    val destinationFile: Path
+    val destination: Path,
+    val parentDirectory: File
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -13,17 +15,19 @@ data class FileData(
 
         other as FileData
 
-        if (fileName != other.fileName) return false
+        if (name != other.name) return false
         if (!responseBody.contentEquals(other.responseBody)) return false
-        if (destinationFile != other.destinationFile) return false
+        if (destination != other.destination) return false
+        if (parentDirectory != other.parentDirectory) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = fileName.hashCode()
+        var result = name.hashCode()
         result = 31 * result + responseBody.contentHashCode()
-        result = 31 * result + destinationFile.hashCode()
+        result = 31 * result + destination.hashCode()
+        result = 31 * result + parentDirectory.hashCode()
         return result
     }
 }

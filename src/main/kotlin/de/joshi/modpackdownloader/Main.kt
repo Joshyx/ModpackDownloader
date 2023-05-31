@@ -3,6 +3,8 @@ package de.joshi.modpackdownloader
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.download.CurseforgeModFetcher
 import de.joshi.modpackdownloader.download.FileDownloader
+import de.joshi.modpackdownloader.models.ManifestData
+import de.joshi.modpackdownloader.models.ModCategory
 import de.joshi.modpackdownloader.overrides.OverridesHandler
 import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
@@ -13,6 +15,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import java.io.File
+import java.net.URL
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
@@ -23,7 +26,7 @@ fun main(args: Array<String>) {
     }!!)
     val targetDirectory = File(args.getOrNull(1) ?: sourceFile.nameWithoutExtension)
 
-    Main().run(sourceFile, targetDirectory, false)
+    Main().run(sourceFile, targetDirectory)
 }
 
 class Main {
@@ -43,11 +46,13 @@ class Main {
             }
         }
         lateinit var baseURL: String
+        val fileNames = ArrayList<String>()
+        val usedDirectories = ArrayList<File>()
     }
 
-    fun run(sourceFile: File, targetDirectory: File, emptyDirectory: Boolean = false) {
+    fun run(sourceFile: File, targetDirectory: File) {
         val startTime = Instant.now().toEpochMilli()
-        LOGGER.info { "Running ModDownloader from $sourceFile to $targetDirectory" }
+        LOGGER.info { "Running Modpack Downloader from $sourceFile to $targetDirectory" }
 
         if (CurseforgeApiKey.hasValidApiKey()) {
             baseURL = "https://api.curseforge.com"
@@ -57,22 +62,17 @@ class Main {
             LOGGER.info { "API Key not detected, using cfproxy" }
         }
 
-        if (emptyDirectory) {
-            targetDirectory.deleteRecursively()
-            targetDirectory.mkdirs()
-            LOGGER.info { "Deleted all files in $targetDirectory" }
-        }
-
         val sourceDirectory = if (sourceFile.extension == "zip") {
             UnzipService().unzip(sourceFile, File(targetDirectory, "originalModPack"))
         } else sourceFile
 
-        val manifest = ManifestParser().getManifest(sourceDirectory)
+        // Parse Manifest
+        val manifest: ManifestData = ManifestParser().getManifest(sourceDirectory)
 
         val modListDownloadStartTime = Instant.now().toEpochMilli()
 
         // Fetch URLs
-        val modList = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
+        val modList: Map<URL, ModCategory> = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
 
         LOGGER.info(
             "Fetched ${modList.size} mod URLs in ${Instant.now().toEpochMilli() - modListDownloadStartTime}ms " +
@@ -80,7 +80,7 @@ class Main {
         )
 
         // Download mods
-        FileDownloader().downloadModFiles(File(targetDirectory, "mods"), modList)
+        FileDownloader().downloadModFiles(targetDirectory, modList)
 
         // Handle overrides
         val overridesHandler = OverridesHandler()
