@@ -3,8 +3,6 @@ run-name: "Build #${{ github.run_number }}"
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - main
   pull_request:
@@ -31,17 +29,17 @@ jobs:
           name: package
           path: staging
 
-  release-github:
-    name: Deploy to GitHub
-    needs: [build]
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: package
-      - uses: softprops/action-gh-release@v1
-        with:
-          files: ./*.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#   release-github:
+#     name: Deploy to GitHub
+#     needs: [build]
+#     if: startsWith(github.ref, 'refs/tags/')
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/download-artifact@v3
+#         with:
+#           name: package
+#       - uses: softprops/action-gh-release@v1
+#         with:
+#           files: ./*.jar
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
