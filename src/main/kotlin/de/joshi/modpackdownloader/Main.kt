@@ -14,11 +14,12 @@ import io.github.oshai.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
+import io.ktor.http.*
 import java.io.File
-import java.net.URL
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 fun main(args: Array<String>) {
     val sourceFile = File(args.getOrNull(0).also {
@@ -47,7 +48,6 @@ class Main {
         }
         lateinit var baseURL: String
         val fileNames = ArrayList<String>()
-        val usedDirectories = ArrayList<File>()
     }
 
     fun run(sourceFile: File, targetDirectory: File) {
@@ -72,11 +72,11 @@ class Main {
         val modListDownloadStartTime = Instant.now().toEpochMilli()
 
         // Fetch URLs
-        val modList: Map<URL, ModCategory> = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
+        val modList: Map<Url, ModCategory> = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
 
         LOGGER.info(
-            "Fetched ${modList.size} mod URLs in ${Instant.now().toEpochMilli() - modListDownloadStartTime}ms " +
-                    "( ${TimeUnit.MILLISECONDS.toSeconds(Instant.now().toEpochMilli() - modListDownloadStartTime)}sec )"
+            "Fetched ${modList.size} mod URLs in " +
+                    "${(Instant.now().toEpochMilli() - modListDownloadStartTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)}"
         )
 
         // Download mods
@@ -94,10 +94,8 @@ class Main {
 
         LOGGER.info("COMPLETED")
         LOGGER.info("Saved all files to $targetDirectory")
-        LOGGER.info(
-            "Process finished in ${Instant.now().toEpochMilli() - startTime}ms " +
-                    "( ~${TimeUnit.MILLISECONDS.toMinutes(Instant.now().toEpochMilli() - startTime)}min )"
-        )
+        LOGGER.info("Process finished in " +
+                "${(Instant.now().toEpochMilli() - startTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)}")
 
         exitProcess(0)
     }
