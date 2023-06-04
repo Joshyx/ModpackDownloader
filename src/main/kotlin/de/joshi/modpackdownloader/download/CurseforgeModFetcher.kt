@@ -6,75 +6,97 @@ import de.joshi.modpackdownloader.Main.Companion.fileNames
 import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.*
 import de.joshi.modpackdownloader.util.getString
+import io.ktor.http.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
-import java.net.URL
 
 class CurseforgeModFetcher {
 
-    fun fetchUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): Map<URL, ModCategory> {
-        val result = mutableMapOf<URL, ModCategory>()
-        manifest.files.map { modData ->
-            try {
-                val modInfo = fetchModInfo(modData)
-                LOGGER.info("Acquired file info for ${modInfo?.category?.getName()} ${modInfo?.name} (Project Id: ${modData.projectID})")
-                if (modInfo?.name !in fileNames) modInfo?.name?.let { fileNames.add(it) }
-                if (requireAll || modData.required) {
+    fun fetchUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): Map<Url, ModCategory> {
+        return runBlocking {
+            val result = mutableMapOf<Url, ModCategory>()
+            manifest.files.forEach { modData ->
+                launch {
+                    try {
+                        val modInfo = fetchModInfo(modData)
 
-                    modInfo?.downloadURL?.let { result.put(it, modInfo.category) } ?: {
+                        LOGGER.info("Acquired file info for ${modInfo?.category?.getName()} ${modInfo?.name} (Project Id: ${modData.projectID})")
+
+                        modInfo?.name?.let {
+                            if (it !in fileNames) fileNames.add(it)
+                        }
+
+                        if (requireAll || modData.required) {
+
+                            modInfo?.downloadURL?.let {
+                                result.put(it, modInfo.category)
+                            } ?: {
+                                logError(
+                                    """
+                                    MalformedUrlException: No download URL exists for ${modInfo?.name}
+                                    - Try downloading it manually instead
+                                    - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
+                                    - ${modInfo?.downloadedInfoString}
+                                """
+                                )
+                            }
+                        } else LOGGER.info("Skipping download for ${modInfo?.name}: Not required")
+
+                    } catch (e: SerializationException) {
                         logError(
                             """
-                                MalformedUrlException: No download URL exists for ${modInfo?.name}
-                                - Try downloading it manually instead
-                                - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
-                                - ${modInfo?.downloadedInfoString}
-                            """
+                            Error downloading file with id ${modData.projectID}.
+                            - Does this file even exist?
+                            - Try downloading it manually instead
+                        """
                         )
                     }
-                } else {
-                    LOGGER.info("Skipping download for ${modInfo?.name}: Not required")
                 }
-            } catch (e: SerializationException) {
-                logError(
-                    """
-                        Error downloading file with id ${modData.projectID}.
-                        - Does this file even exist?
-                        - Try downloading it manually instead
-                    """
-                )
             }
-        }.filterIsInstance(URL::class.java)
-        return result
+            return@runBlocking result
+        }
     }
 
-    fun fetchModInfo(modData: ModData): ModInfo? {
+    suspend fun fetchModInfo(modData: ModData): ModInfo? {
         val category = fetchCategory(modData.projectID)
-
-        val modInfo: JsonObject = try {
-            fetchFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
-        } catch (e: Exception) {
-            LOGGER.error("Error with downloading file info for ${category.getName()} ${modData.projectID}: ${HttpService.getHttpBody("$baseURL/v1/mods/${modData.projectID}/files/${modData.fileID}")}")
-            logError("Error with downloading file info for ${category.getName()} with ID: ${modData.projectID}")
-            return null
+        val modInfo: JsonObject? = withContext(Dispatchers.Default) {
+            try {
+                fetchFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
+            } catch (e: Exception) {
+                LOGGER.error(
+                    "Error with downloading file info for ${category.getName()} ${modData.projectID}: ${
+                        HttpService.getHttpBody(
+                            "$baseURL/v1/mods/${modData.projectID}/files/${modData.fileID}"
+                        )
+                    }"
+                )
+                logError("Error with downloading file info for ${category.getName()} with ID: ${modData.projectID}")
+                return@withContext null
+            }
         }
 
-        val name = modInfo["fileName"]!!.getString()
-        var url: URL?
-        try {
-            url = URL(modInfo["downloadUrl"]!!.getString())
-            LOGGER.info { "Parsed URL $url" }
-        } catch (e: Exception) {
+        if (modInfo.isNullOrEmpty()) return null
 
-            try {
-                url = URL(fetchAlternativeDownloadUrl(modInfo))
+        val name = modInfo["fileName"]!!.getString()
+        var url: Url?
+        try {
+            url = Url(modInfo["downloadUrl"]!!.getString())
+            if (url.toString() == "http://localhost/null") {
+                url = Url(fetchAlternativeDownloadUrl(modInfo))
                 LOGGER.info { "Parsed Fallback URL $url" }
-            } catch (e: Exception) {
-                logError("No url found for ${category.getName()} ${modData.projectID}")
-                url = null
+            } else {
+                LOGGER.info { "Parsed URL $url" }
             }
+        } catch (e: Exception) {
+            logError("No url found for ${category.getName()} ${modData.projectID}")
+            url = null
         }
         return ModInfo(name, url, modData.required, modInfo, category)
     }
@@ -83,7 +105,7 @@ class CurseforgeModFetcher {
         return Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/files/$fileId"))
     }
 
-    fun fetchCategory(projectId: Int): ModCategory {
+    private suspend fun fetchCategory(projectId: Int): ModCategory = withContext(Dispatchers.Default) {
         val response: JsonObject = Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId"))
         val category = try {
             response["data"]?.jsonObject!!["classId"]!!.getString().toInt()
@@ -91,9 +113,9 @@ class CurseforgeModFetcher {
             LOGGER.error("Error with fetching file category for file with ID: $projectId")
             logError("Error with fetching file category for file with ID: $projectId")
 
-            return ModCategory.MOD // Fallback to mods folder
+            return@withContext ModCategory.MOD // Fallback to mods folder
         }
-        return when (category) {
+        return@withContext when (category) {
             6 -> ModCategory.MOD
             12 -> ModCategory.RESOURCE_PACK
             4546 -> ModCategory.SHADER_PACK

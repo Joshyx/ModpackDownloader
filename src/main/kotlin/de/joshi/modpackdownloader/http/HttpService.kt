@@ -2,7 +2,6 @@ package de.joshi.modpackdownloader.http
 
 import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.Main.Companion.client
-import de.joshi.modpackdownloader.Main.Companion.usedDirectories
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.models.FileData
 import de.joshi.modpackdownloader.models.ModCategory
@@ -10,11 +9,11 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.exists
@@ -43,12 +42,10 @@ object HttpService {
     /**
      * Starts downloading a file if the file does not already exist on the path.
      */
-    suspend fun getFile(fileUrl: URL, targetDirectory: File, category: ModCategory, fileCount: Int): FileData? = withContext(Dispatchers.IO) {
-        val fileName: String = fileUrl.file.substringAfterLast("/")
+    suspend fun getFile(fileUrl: Url, targetDirectory: File, category: ModCategory, fileCount: Int): FileData? = withContext(Dispatchers.IO) {
+        val fileName: String = fileUrl.toString().substringAfterLast("/")
         val parentDirectory = File(targetDirectory, category.getFolderName())
         val destination: Path = Paths.get("$parentDirectory/$fileName")
-
-        if (parentDirectory !in usedDirectories) usedDirectories.add(parentDirectory)
 
         if (destination.exists()) {
             LOGGER.info("Skipping $fileName, already exist")

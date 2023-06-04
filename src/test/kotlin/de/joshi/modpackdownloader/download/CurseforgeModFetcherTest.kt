@@ -6,8 +6,6 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
-import java.net.URL
-import kotlin.test.assertContentEquals
 
 class CurseforgeModFetcherTest {
 
@@ -41,7 +39,7 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    fun getModInfo() {
+    suspend fun getModInfo() {
 
         assertEquals(
             "upgradedcore-1.16.5-1.1.0.3-release.jar",
@@ -50,7 +48,7 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    fun getModInfoWithError() {
+    suspend fun getModInfoWithError() {
 
         assertNull(
             CurseforgeModFetcher().fetchModInfo(ModData(12343, 324134534, true))?.downloadURL
