@@ -8,6 +8,13 @@
         </set>
       </option>
     </inspection_tool>
+    <inspection_tool class="MavenPackageUpdate" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="excludeList">
+        <list>
+          <option value="org.jetbrains.kotlinx:kotlinx-coroutines-core" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="ReplaceUntilWithRangeUntil" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
   </profile>
 </component>
