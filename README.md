@@ -1,5 +1,6 @@
 # 🔩 Modpack Downloader 
 
+[![Downloads](https://img.shields.io/github/downloads/Joshyx/ModpackDownloader/total?color=light&label=Downloads)]()
 [![Build](https://github.com/Joshyx/ModpackDownloader/actions/workflows/build.yml/badge.svg)](https://github.com/Joshyx/ModpackDownloader/actions/workflows/build.yml)
 
 A command-line interface for downloading all mods from a CurseForge modpack.
