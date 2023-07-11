@@ -11,7 +11,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.file.Path
@@ -24,19 +23,17 @@ object HttpService {
     private var skippedCount = 0
     private var previousProgress = 0
 
-    fun getHttpBody(url: String, vararg apiKey: String?): String {
-        return runBlocking {
-            val httpResponse: HttpResponse = client.get(url) {
-                headers {
-                    apiKey.getOrNull(0)?.let {
-                        append("x-api-key", it)
-                    } ?: run {
-                        CurseforgeApiKey.getApiKey()?.let { append("x-api-key", it) }
-                    }
+    suspend fun getHttpBody(url: String, vararg apiKey: String?): String {
+        val httpResponse: HttpResponse = client.get(url) {
+            headers {
+                apiKey.getOrNull(0)?.let {
+                    append("x-api-key", it)
+                } ?: run {
+                    CurseforgeApiKey.getApiKey()?.let { append("x-api-key", it) }
                 }
             }
-            return@runBlocking httpResponse.body<String>()
         }
+        return httpResponse.body()
     }
 
     /**

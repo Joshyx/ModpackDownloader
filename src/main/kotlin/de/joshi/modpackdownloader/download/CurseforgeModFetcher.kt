@@ -27,35 +27,36 @@ class CurseforgeModFetcher {
                     try {
                         val modInfo = fetchModInfo(modData)
 
-                        LOGGER.info("Acquired file info for ${modInfo?.category?.getName()} ${modInfo?.name} (Project Id: ${modData.projectID})")
+                        LOGGER.info(
+                            "Acquired file info for ${modInfo?.category?.getName()} " +
+                                    "${modInfo?.name} (Project Id: ${modData.projectID})"
+                        )
 
                         modInfo?.name?.let {
                             if (it !in fileNames) fileNames.add(it)
                         }
 
                         if (requireAll || modData.required) {
-
-                            modInfo?.downloadURL?.let {
-                                result.put(it, modInfo.category)
-                            } ?: {
+                            if (modInfo?.downloadURL != null) {
+                                result[modInfo.downloadURL] = modInfo.category
+                            } else {
                                 logError(
                                     """
-                                    MalformedUrlException: No download URL exists for ${modInfo?.name}
-                                    - Try downloading it manually instead
-                                    - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
-                                    - ${modInfo?.downloadedInfoString}
-                                """
+                                        MalformedUrlException: No download URL exists for ${modInfo?.name}
+                                        - Try downloading it manually instead
+                                        - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
+                                        - ${modInfo?.downloadedInfoString}
+                                        """
                                 )
                             }
                         } else LOGGER.info("Skipping download for ${modInfo?.name}: Not required")
-
                     } catch (e: SerializationException) {
                         logError(
                             """
-                            Error downloading file with id ${modData.projectID}.
-                            - Does this file even exist?
-                            - Try downloading it manually instead
-                        """
+                                Error downloading file with id ${modData.projectID}.
+                                - Does this file even exist?
+                                - Try downloading it manually instead
+                                """
                         )
                     }
                 }
@@ -101,7 +102,7 @@ class CurseforgeModFetcher {
         return ModInfo(name, url, modData.required, modInfo, category)
     }
 
-    fun fetchFileInfo(projectId: Int, fileId: Int): JsonObject {
+    suspend fun fetchFileInfo(projectId: Int, fileId: Int): JsonObject {
         return Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/files/$fileId"))
     }
 
@@ -130,7 +131,7 @@ class CurseforgeModFetcher {
         return "https://edge.forgecdn.net/files/${id.substring(0, 4)}/${id.substring(4)}/$fileName"
     }
 
-    fun fetchManualDownloadUrl(projectId: Int, fileId: Int): String {
+    suspend fun fetchManualDownloadUrl(projectId: Int, fileId: Int): String {
         val modInfo: JsonObject =
             Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/"))
         val modSlugName = modInfo["data"]?.jsonObject?.get("slug")?.getString()

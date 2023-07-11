@@ -12,7 +12,7 @@ import kotlin.test.assertContains
 class HttpServiceTest {
 
     @Test
-    fun getHttpBody() {
+    suspend fun getHttpBody() {
         assertContains(
             HttpService.getHttpBody("https://example.com"), "<!DOCTYPE html>", true
         )

@@ -56,7 +56,7 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    fun downloadFileInfo() {
+    suspend fun downloadFileInfo() {
         assert(!CurseforgeModFetcher().fetchFileInfo(566700, 3969615).isEmpty())
     }
 
@@ -69,7 +69,7 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    fun getManualDownloadUrl() {
+    suspend fun getManualDownloadUrl() {
         assertEquals(
             "https://www.curseforge.com/minecraft/mc-mods/upgraded-core/download/3969615",
             CurseforgeModFetcher().fetchManualDownloadUrl(566700, 3969615)
