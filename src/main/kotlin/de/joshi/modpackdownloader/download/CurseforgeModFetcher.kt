@@ -124,7 +124,7 @@ class CurseforgeModFetcher {
         var url: String?
         try {
             url = modInfo.downloadUrl
-            if (url == "http://localhost/null") {
+            if (url == null || url == "http://localhost/null") {
                 url = fetchAlternativeDownloadUrl(modInfo)
                 LOGGER.info { "Parsed Fallback URL $url" }
             } else {

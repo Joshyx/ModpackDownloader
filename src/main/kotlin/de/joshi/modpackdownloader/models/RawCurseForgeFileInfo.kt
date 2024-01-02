@@ -10,7 +10,7 @@ data class RawCurseForgeFileInfo(
     val isAvailable: Boolean,
     val displayName: String,
     val fileName: String,
-    val downloadUrl: String,
+    val downloadUrl: String?,
     val gameVersions: List<String>,
 )
 
