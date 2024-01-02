@@ -5,7 +5,6 @@ import de.joshi.modpackdownloader.Main.Companion.baseURL
 import de.joshi.modpackdownloader.Main.Companion.fileNames
 import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.*
-import de.joshi.modpackdownloader.util.getString
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,10 +13,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
 
 class CurseforgeModFetcher {
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     fun fetchUrlsForMods(manifest: ManifestData, requireAll: Boolean = true): Map<Url, ModCategory> {
         return runBlocking {
@@ -45,7 +45,7 @@ class CurseforgeModFetcher {
                                         MalformedUrlException: No download URL exists for ${modInfo?.name}
                                         - Try downloading it manually instead
                                         - ${fetchManualDownloadUrl(modData.projectID, modData.fileID)}
-                                        - ${modInfo?.downloadedInfoString}
+                                        - ${modInfo?.toString()}
                                         """
                                 )
                             }
@@ -67,9 +67,9 @@ class CurseforgeModFetcher {
 
     suspend fun fetchModInfo(modData: ModData): ModInfo? {
         val category = fetchCategory(modData.projectID)
-        val modInfo: JsonObject? = withContext(Dispatchers.Default) {
+        val modInfo: RawCurseForgeFileInfo? = withContext(Dispatchers.Default) {
             try {
-                fetchFileInfo(modData.projectID, modData.fileID)["data"]?.jsonObject!!
+                fetchFileInfo(modData.projectID, modData.fileID)
             } catch (e: Exception) {
                 LOGGER.error(
                     "Error with downloading file info for ${category.getName()} ${modData.projectID}: ${
@@ -83,22 +83,22 @@ class CurseforgeModFetcher {
             }
         }
 
-        if (modInfo.isNullOrEmpty()) return null
+        if (modInfo == null) return null
 
-        val name = modInfo["fileName"]!!.getString().replace("%2b", "+")
+        val name = modInfo.fileName.replace("%2b", "+")
         val url = fetchUrl(modInfo, category, modData)
 
         return ModInfo(name, url, modData.required, modInfo, category)
     }
 
-    suspend fun fetchFileInfo(projectId: Int, fileId: Int): JsonObject {
-        return Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/files/$fileId"))
+    suspend fun fetchFileInfo(projectId: Int, fileId: Int): RawCurseForgeFileInfo {
+        return json.decodeFromString<RawCurseForgeFileInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/files/$fileId")).data
     }
 
     private suspend fun fetchCategory(projectId: Int): ModCategory = withContext(Dispatchers.Default) {
-        val response: JsonObject = Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId"))
+        val response = json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
         val category = try {
-            response["data"]?.jsonObject!!["classId"]!!.getString().toInt()
+            response.classId
         } catch (e: Exception) {
             LOGGER.error("Error with fetching file category for file with ID: $projectId")
             logError("Error with fetching file category for file with ID: $projectId")
@@ -114,10 +114,10 @@ class CurseforgeModFetcher {
         }
     }
 
-    fun fetchUrl(modInfo: JsonObject, category: ModCategory, modData: ModData): Url? {
+    fun fetchUrl(modInfo: RawCurseForgeFileInfo, category: ModCategory, modData: ModData): Url? {
         var url: String?
         try {
-            url = modInfo["downloadUrl"]!!.getString()
+            url = modInfo.downloadUrl
             if (url == "http://localhost/null") {
                 url = fetchAlternativeDownloadUrl(modInfo)
                 LOGGER.info { "Parsed Fallback URL $url" }
@@ -131,16 +131,15 @@ class CurseforgeModFetcher {
         return url?.let { Url(it.replace("%2b", "+")) }
     }
 
-    fun fetchAlternativeDownloadUrl(modInfo: JsonObject): String {
-        val id = modInfo["id"]!!.getString()
-        val fileName = modInfo["fileName"]!!.getString()
+    fun fetchAlternativeDownloadUrl(modInfo: RawCurseForgeFileInfo): String {
+        val id = modInfo.id.toString()
+        val fileName = modInfo.fileName
         return "https://edge.forgecdn.net/files/${id.substring(0, 4)}/${id.substring(4)}/$fileName"
     }
 
     suspend fun fetchManualDownloadUrl(projectId: Int, fileId: Int): String {
-        val modInfo: JsonObject =
-            Json.decodeFromString(HttpService.getHttpBody("$baseURL/v1/mods/$projectId/"))
-        val modSlugName = modInfo["data"]?.jsonObject?.get("slug")?.getString()
+        val modInfo = json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
+        val modSlugName = modInfo.slug
         return "https://www.curseforge.com/minecraft/mc-mods/$modSlugName/download/$fileId"
     }
 
