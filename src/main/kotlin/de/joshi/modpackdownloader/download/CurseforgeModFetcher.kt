@@ -85,20 +85,9 @@ class CurseforgeModFetcher {
 
         if (modInfo.isNullOrEmpty()) return null
 
-        val name = modInfo["fileName"]!!.getString()
-        var url: Url?
-        try {
-            url = Url(modInfo["downloadUrl"]!!.getString())
-            if (url.toString() == "http://localhost/null") {
-                url = Url(fetchAlternativeDownloadUrl(modInfo))
-                LOGGER.info { "Parsed Fallback URL $url" }
-            } else {
-                LOGGER.info { "Parsed URL $url" }
-            }
-        } catch (e: Exception) {
-            logError("No url found for ${category.getName()} ${modData.projectID}")
-            url = null
-        }
+        val name = modInfo["fileName"]!!.getString().replace("%2b", "+")
+        val url = fetchUrl(modInfo, category, modData)
+
         return ModInfo(name, url, modData.required, modInfo, category)
     }
 
@@ -123,6 +112,23 @@ class CurseforgeModFetcher {
 
             else -> ModCategory.MOD // Fallback to mods folder
         }
+    }
+
+    fun fetchUrl(modInfo: JsonObject, category: ModCategory, modData: ModData): Url? {
+        var url: String?
+        try {
+            url = modInfo["downloadUrl"]!!.getString()
+            if (url == "http://localhost/null") {
+                url = fetchAlternativeDownloadUrl(modInfo)
+                LOGGER.info { "Parsed Fallback URL $url" }
+            } else {
+                LOGGER.info { "Parsed URL $url" }
+            }
+        } catch (e: Exception) {
+            logError("No url found for ${category.getName()} ${modData.projectID}")
+            url = null
+        }
+        return url?.let { Url(it.replace("%2b", "+")) }
     }
 
     fun fetchAlternativeDownloadUrl(modInfo: JsonObject): String {
