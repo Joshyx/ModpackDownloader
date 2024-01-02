@@ -85,7 +85,10 @@ class CurseforgeModFetcher {
 
         if (modInfo == null) return null
 
-        val name = modInfo.fileName.replace("%2b", "+")
+        val name = modInfo.fileName
+            .replace("%2b", "+")
+            .replace("%20", "+")
+            .replace(" ", "+")
         val url = fetchUrl(modInfo, category, modData)
 
         return ModInfo(name, url, modData.required, modInfo, category)
@@ -130,7 +133,13 @@ class CurseforgeModFetcher {
             logError("No url found for ${category.getName()} ${modData.projectID}")
             url = null
         }
-        return url?.let { Url(it.replace("%2b", "+")) }
+        return url?.let {
+            Url(it
+                .replace("%2b", "+")
+                .replace("%20", "+")
+                .replace(" ", "+")
+            )
+        }
     }
 
     fun fetchAlternativeDownloadUrl(modInfo: RawCurseForgeFileInfo): String {
