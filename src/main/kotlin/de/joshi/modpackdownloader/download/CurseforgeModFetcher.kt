@@ -96,19 +96,21 @@ class CurseforgeModFetcher {
     }
 
     private suspend fun fetchCategory(projectId: Int): ModCategory = withContext(Dispatchers.Default) {
-        val response = json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
-        val category = try {
-            response.classId
+        val response = try {
+            json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
         } catch (e: Exception) {
             LOGGER.error("Error with fetching file category for file with ID: $projectId")
             logError("Error with fetching file category for file with ID: $projectId")
 
             return@withContext ModCategory.MOD // Fallback to mods folder
         }
+        val category = response.classId
+
         return@withContext when (category) {
             6 -> ModCategory.MOD
             12 -> ModCategory.RESOURCE_PACK
             4546 -> ModCategory.SHADER_PACK
+            4471 -> ModCategory.MOD_PACK
 
             else -> ModCategory.MOD // Fallback to mods folder
         }

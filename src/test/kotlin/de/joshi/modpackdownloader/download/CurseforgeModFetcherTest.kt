@@ -1,45 +1,45 @@
 package de.joshi.modpackdownloader.download
 
 import de.joshi.modpackdownloader.models.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import io.ktor.http.*
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import kotlin.test.assertContentEquals
 
 class CurseforgeModFetcherTest {
 
     @Test
     fun downloadUrlsForMods() {
 
-// Todo: Fix this test
-//        assertContentEquals(
-//            setOf(
-//                URL("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar") to ModCategory.MOD,
-//                URL("https://edge.forgecdn.net/files/2668/311/%C2%A7c%C2%A7lCream%20%C2%A77Cuisine%20Resource%20Pack%20-%200.5.0.zip") to ModCategory.RESOURCE_PACK,
-//                URL("https://edge.forgecdn.net/files/3969/615/upgradedcore-1.16.5-1.1.0.3-release.jar") to ModCategory.MOD,
-//            ), CurseforgeModFetcher().fetchUrlsForMods(
-//                ManifestData(
-//                    MinecraftData("", listOf(ModLoaderData("", false))),
-//                    "",
-//                    0.0,
-//                    "",
-//                    "",
-//                    "",
-//                    listOf(
-//                        ModData(419699, 3857643, true),
-//                        ModData(74072, 3695126, true),
-//                        ModData(566700, 3969615, true),
-//                        ModData(567657, 3245, true),
-//                    ),
-//                    "",
-//                )
-//            )
-//        )
+        assertContentEquals(
+            listOf(
+                Url("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar") to ModCategory.MOD,
+                Url("https://edge.forgecdn.net/files/3695/126/TConstruct-1.16.5-3.3.4.335.jar") to ModCategory.MOD,
+                Url("https://edge.forgecdn.net/files/3969/615/upgradedcore-1.16.5-1.1.0.3-release.jar") to ModCategory.MOD,
+            ).sortedBy { it.first.toString() },
+            CurseforgeModFetcher().fetchUrlsForMods(
+                ManifestData(
+                    MinecraftData("", listOf(ModLoaderData("", false))),
+                    "",
+                    0.0,
+                    "",
+                    "",
+                    "",
+                    listOf(
+                        ModData(419699, 3857643, true),
+                        ModData(74072, 3695126, true),
+                        ModData(566700, 3969615, true),
+                    ),
+                    "",
+                )
+            ).toList().sortedBy { it.first.toString() }
+        )
     }
 
     @Test
-    suspend fun getModInfo() {
+    fun getModInfo() = runTest {
 
         assertEquals(
             "upgradedcore-1.16.5-1.1.0.3-release.jar",
@@ -48,18 +48,18 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    suspend fun getModInfoWithError() {
+    fun getModInfoWithError() = runTest {
 
-        assertNull(
+        assertNull (
             CurseforgeModFetcher().fetchModInfo(ModData(12343, 324134534, true))?.downloadURL
         )
     }
 
     @Test
-    suspend fun downloadFileInfo() {
+    fun downloadFileInfo() = runTest {
         assertEquals(
-            5667003969615,
-            CurseforgeModFetcher().fetchFileInfo(566700, 3969615).id
+            566700,
+            CurseforgeModFetcher().fetchFileInfo(566700, 3969615).modId
         )
     }
 
@@ -81,7 +81,7 @@ class CurseforgeModFetcherTest {
     }
 
     @Test
-    suspend fun getManualDownloadUrl() {
+    fun getManualDownloadUrl() = runTest {
         assertEquals(
             "https://www.curseforge.com/minecraft/mc-mods/upgraded-core/download/3969615",
             CurseforgeModFetcher().fetchManualDownloadUrl(566700, 3969615)
