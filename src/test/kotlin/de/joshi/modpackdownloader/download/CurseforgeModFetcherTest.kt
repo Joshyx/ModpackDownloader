@@ -57,14 +57,26 @@ class CurseforgeModFetcherTest {
 
     @Test
     suspend fun downloadFileInfo() {
-        assert(!CurseforgeModFetcher().fetchFileInfo(566700, 3969615).isEmpty())
+        assertEquals(
+            5667003969615,
+            CurseforgeModFetcher().fetchFileInfo(566700, 3969615).id
+        )
     }
 
     @Test
     fun getAlternativeDownloadUrl() {
         assertEquals(
             "https://edge.forgecdn.net/files/1234/567/myfile.jar",
-            CurseforgeModFetcher().fetchAlternativeDownloadUrl(Json.decodeFromString("{\"id\":\"1234567\", \"fileName\":\"myfile.jar\"}"))
+            CurseforgeModFetcher().fetchAlternativeDownloadUrl(RawCurseForgeFileInfo(
+                1234567,
+                123,
+                123,
+                true,
+                "myfile.jar",
+                "myfile.jar",
+                "https://edge.forgecdn.net/files/1234/567/myfile.jar",
+                listOf("1.16.5"),
+            ))
         )
     }
 
