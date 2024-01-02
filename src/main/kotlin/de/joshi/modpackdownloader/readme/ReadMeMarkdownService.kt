@@ -24,9 +24,7 @@ Mod Count: `${manifestData.files.size}`
 
 ## Errors
 
-```cmd
-${ReadMeInfo.errors.joinToString("\n```\n\n```cmd\n").replace("\t", "    ")}
-```
+${ReadMeInfo.errors.joinToString("\n\n").replace("\t", "    ")}
 
         """.trimIndent()
     }

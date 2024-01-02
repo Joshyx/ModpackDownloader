@@ -1,10 +1,10 @@
 package de.joshi.modpackdownloader.download
 
-import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.Main.Companion.baseURL
 import de.joshi.modpackdownloader.Main.Companion.fileNames
 import de.joshi.modpackdownloader.http.HttpService
 import de.joshi.modpackdownloader.models.*
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +15,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class CurseforgeModFetcher {
+    private val LOGGER = KotlinLogging.logger { }
     val json = Json {
         ignoreUnknownKeys = true
     }
@@ -27,10 +28,10 @@ class CurseforgeModFetcher {
                     try {
                         val modInfo = fetchModInfo(modData)
 
-                        LOGGER.info(
+                        LOGGER.info {
                             "Acquired file info for ${modInfo?.category?.getName()} " +
                                     "${modInfo?.name} (Project Id: ${modData.projectID})"
-                        )
+                        }
 
                         modInfo?.name?.let {
                             if (it !in fileNames) fileNames.add(it)
@@ -49,7 +50,7 @@ class CurseforgeModFetcher {
                                         """
                                 )
                             }
-                        } else LOGGER.info("Skipping download for ${modInfo?.name}: Not required")
+                        } else LOGGER.info { "Skipping download for ${modInfo?.name}: Not required" }
                     } catch (e: SerializationException) {
                         logError(
                             """
@@ -102,7 +103,7 @@ class CurseforgeModFetcher {
         val response = try {
             json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
         } catch (e: Exception) {
-            LOGGER.error("Error with fetching file category for file with ID: $projectId")
+            LOGGER.error { "Error with fetching file category for file with ID: $projectId" }
             logError("Error with fetching file category for file with ID: $projectId")
 
             return@withContext ModCategory.MOD // Fallback to mods folder
@@ -119,7 +120,7 @@ class CurseforgeModFetcher {
         }
     }
 
-    fun fetchUrl(modInfo: RawCurseForgeFileInfo, category: ModCategory, modData: ModData): Url? {
+    private fun fetchUrl(modInfo: RawCurseForgeFileInfo, category: ModCategory, modData: ModData): Url? {
         var url: String?
         try {
             url = modInfo.downloadUrl
@@ -134,10 +135,11 @@ class CurseforgeModFetcher {
             url = null
         }
         return url?.let {
-            Url(it
-                .replace("%2b", "+")
-                .replace("%20", "+")
-                .replace(" ", "+")
+            Url(
+                it
+                    .replace("%2b", "+")
+                    .replace("%20", "+")
+                    .replace(" ", "+")
             )
         }
     }
@@ -149,14 +151,16 @@ class CurseforgeModFetcher {
     }
 
     suspend fun fetchManualDownloadUrl(projectId: Int, fileId: Int): String {
-        val modInfo = json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
+        val modInfo =
+            json.decodeFromString<RawCurseForgeModInfoWrapper>(HttpService.getHttpBody("$baseURL/v1/mods/$projectId")).data
         val modSlugName = modInfo.slug
         return "https://www.curseforge.com/minecraft/mc-mods/$modSlugName/download/$fileId"
     }
 
     private fun logError(error: String) {
-        ReadMeInfo.errors.add(error)
-        LOGGER.error(error)
+        val trimmedError = error.trimIndent().trim()
+        ReadMeInfo.errors.add(trimmedError)
+        LOGGER.error { trimmedError }
     }
 
 }

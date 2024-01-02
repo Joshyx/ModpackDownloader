@@ -1,10 +1,10 @@
 package de.joshi.modpackdownloader.http
 
-import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.Main.Companion.client
 import de.joshi.modpackdownloader.auth.CurseforgeApiKey
 import de.joshi.modpackdownloader.models.FileData
 import de.joshi.modpackdownloader.models.ModCategory
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -19,6 +19,7 @@ import kotlin.io.path.exists
 
 object HttpService {
 
+    private val LOGGER = KotlinLogging.logger { }
     private val filesDownloaded = mutableMapOf<String, String>()
     private var skippedCount = 0
     private var previousProgress = 0
@@ -45,7 +46,7 @@ object HttpService {
         val destination: Path = Paths.get("$parentDirectory/$fileName")
 
         if (destination.exists()) {
-            LOGGER.info("Skipping $fileName, already exist")
+            LOGGER.info { "Skipping $fileName, already exist" }
             skippedCount += 1
             return@withContext null
         }
@@ -60,11 +61,11 @@ object HttpService {
                 val progress = filesDownloaded.size * 100 / (fileCount - skippedCount)
 
                 if ((min * 100 / max) > 90 && url !in filesDownloaded) {
-                    LOGGER.info("Downloading $fileName")
+                    LOGGER.info { "Downloading $fileName" }
                     filesDownloaded[url] = fileName
                 }
 
-                if (progress != previousProgress && progress == 100) LOGGER.info("Done!")
+                if (progress != previousProgress && progress == 100) LOGGER.info { "Done!" }
 
                 previousProgress = progress
             }

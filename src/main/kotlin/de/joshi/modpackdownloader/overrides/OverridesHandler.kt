@@ -1,11 +1,13 @@
 package de.joshi.modpackdownloader.overrides
 
-import de.joshi.modpackdownloader.Main.Companion.LOGGER
 import de.joshi.modpackdownloader.models.ManifestData
 import de.joshi.modpackdownloader.util.getOrCreateSubfolder
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 
 class OverridesHandler {
+
+    private val LOGGER = KotlinLogging.logger { }
 
     fun handleOverrides(overridesFolder: File, targetDirectory: File) {
 
@@ -19,12 +21,12 @@ class OverridesHandler {
                 LOGGER.info { "Found override folder ${file.name} to copy" }
                 file.copyRecursively(targetDirectory.getOrCreateSubfolder(file.name), true)
                 for (copiedFile in file.list()!!) {
-                    LOGGER.info("Copying $file/$copiedFile to $targetDirectory/${file.name}/$copiedFile")
+                    LOGGER.info { "Copying $file/$copiedFile to $targetDirectory/${file.name}/$copiedFile" }
                 }
-                LOGGER.info("Copied ${file.list()!!.size} file${if (file.list()!!.size == 1) "" else "s"} into $targetDirectory/${file.name}")
+                LOGGER.info { "Copied ${file.list()!!.size} file${if (file.list()!!.size == 1) "" else "s"} into $targetDirectory/${file.name}" }
 
             } else {
-                LOGGER.warn("There is an override for some files in $file that is not automatically dealt with by this program")
+                LOGGER.warn { "There is an override for some files in $file that is not automatically dealt with by this program" }
             }
         }
     }

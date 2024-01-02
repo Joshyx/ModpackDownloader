@@ -1,6 +1,6 @@
 package de.joshi.modpackdownloader.zip
 
-import de.joshi.modpackdownloader.Main.Companion.LOGGER
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -10,6 +10,8 @@ import java.util.zip.ZipInputStream
 
 
 class UnzipService {
+
+    private val LOGGER = KotlinLogging.logger { }
 
     fun unzip(zipFile: File, targetDirectory: File): File {
         val buffer = ByteArray(1024)
@@ -42,11 +44,11 @@ class UnzipService {
         zis.closeEntry()
         zis.close()
 
-        LOGGER.info("Extracted $zipFile to $targetDirectory")
+        LOGGER.info { "Extracted $zipFile to $targetDirectory" }
         return targetDirectory
     }
 
-    fun createNewFile(destinationDir: File, zipEntry: ZipEntry): File {
+    private fun createNewFile(destinationDir: File, zipEntry: ZipEntry): File {
         val destFile = File(destinationDir, zipEntry.name)
         val destDirPath = destinationDir.canonicalPath
         val destFilePath = destFile.canonicalPath

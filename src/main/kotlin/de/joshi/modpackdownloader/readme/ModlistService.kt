@@ -1,10 +1,12 @@
 package de.joshi.modpackdownloader.readme
 
-import de.joshi.modpackdownloader.Main.Companion.LOGGER
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 import java.nio.file.Files
 
 class ModlistService {
+
+    private val LOGGER = KotlinLogging.logger { }
 
     fun createModlist(sourceFile: File, targetFile: File, modOverrides: File?) {
 

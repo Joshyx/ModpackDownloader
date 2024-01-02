@@ -10,7 +10,7 @@ import de.joshi.modpackdownloader.parser.ManifestParser
 import de.joshi.modpackdownloader.readme.ModlistService
 import de.joshi.modpackdownloader.readme.ReadMeMarkdownService
 import de.joshi.modpackdownloader.zip.UnzipService
-import io.github.oshai.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
@@ -31,9 +31,9 @@ fun main(args: Array<String>) {
 }
 
 class Main {
+    private val LOGGER = KotlinLogging.logger { }
 
     companion object {
-        val LOGGER = KotlinLogging.logger { }
         val client = HttpClient(OkHttp) {
             install(HttpTimeout) {
                 socketTimeoutMillis = 600000
@@ -68,15 +68,19 @@ class Main {
         // Parse Manifest
         val manifest: ManifestData = ManifestParser().getManifest(sourceDirectory)
 
+        LOGGER.info { "Starting URL fetching" }
         val modListDownloadStartTime = Instant.now().toEpochMilli()
 
         // Fetch URLs
         val modList: Map<Url, ModCategory> = CurseforgeModFetcher().fetchUrlsForMods(manifest, false)
 
-        LOGGER.info(
+        LOGGER.info {
             "Fetched ${modList.size} mod URLs in " +
-                    "${(Instant.now().toEpochMilli() - modListDownloadStartTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)}"
-        )
+                    "${
+                        (Instant.now()
+                            .toEpochMilli() - modListDownloadStartTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)
+                    }"
+        }
 
         // Download mods
         FileDownloader().downloadModFiles(targetDirectory, modList)
@@ -91,10 +95,12 @@ class Main {
         ModlistService().createModlist(sourceDirectory, targetDirectory, overridesFolder)
         ReadMeMarkdownService().saveReadMe(targetDirectory, manifest)
 
-        LOGGER.info("COMPLETED")
-        LOGGER.info("Saved all files to $targetDirectory")
-        LOGGER.info("Process finished in " +
-                "${(Instant.now().toEpochMilli() - startTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)}")
+        LOGGER.info { "COMPLETED" }
+        LOGGER.info { "Saved all files to $targetDirectory" }
+        LOGGER.info {
+            "Process finished in " +
+                    "${(Instant.now().toEpochMilli() - startTime).milliseconds.absoluteValue.coerceAtLeast(0.seconds)}"
+        }
 
         exitProcess(0)
     }
