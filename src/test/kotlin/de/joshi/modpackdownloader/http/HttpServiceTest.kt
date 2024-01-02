@@ -21,12 +21,14 @@ class HttpServiceTest {
 
     @Test
     fun getFile() {
-        val path = File("test/downloaded/")
+        val path = File("target/test/downloaded/")
 
         path.deleteRecursively()
         FileDownloader().downloadModFiles(
             path, mapOf(Url("https://edge.forgecdn.net/files/3857/643/architectury-1.32.66.jar") to ModCategory.MOD)
         )
         assertTrue(Files.exists(path.toPath()))
+
+        path.deleteRecursively()
     }
 }

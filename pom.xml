@@ -6,7 +6,7 @@
 
     <artifactId>ModpackDownloader</artifactId>
     <groupId>de.joshi.modpackdownloader</groupId>
-    <version>1.4</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>consoleApp</name>
@@ -132,7 +132,7 @@
                 <executions>
                     <execution>
                         <id>default-jar</id>
-                        <phase>none</phase>
+                        <phase>package</phase>
                     </execution>
                 </executions>
             </plugin>
