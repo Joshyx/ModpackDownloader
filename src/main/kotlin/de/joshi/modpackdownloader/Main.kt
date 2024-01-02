@@ -46,7 +46,7 @@ class Main {
                 }
             }
         }
-        lateinit var baseURL: String
+        var baseURL = "https://cfproxy.bmpm.workers.dev"
         val fileNames = ArrayList<String>()
     }
 
@@ -58,7 +58,6 @@ class Main {
             baseURL = "https://api.curseforge.com"
             LOGGER.info { "API Key detected" }
         } else {
-            baseURL = "https://cfproxy.bmpm.workers.dev"
             LOGGER.info { "API Key not detected, using cfproxy" }
         }
 

@@ -3,6 +3,7 @@ package de.joshi.modpackdownloader.http
 import de.joshi.modpackdownloader.download.FileDownloader
 import de.joshi.modpackdownloader.models.ModCategory
 import io.ktor.http.*
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -12,7 +13,7 @@ import kotlin.test.assertContains
 class HttpServiceTest {
 
     @Test
-    suspend fun getHttpBody() {
+    fun getHttpBody() = runTest {
         assertContains(
             HttpService.getHttpBody("https://example.com"), "<!DOCTYPE html>", true
         )
